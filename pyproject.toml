@@ -7,7 +7,10 @@ name = "credit_card_fraud_analysis"
 version = "0.0.1"
 description = "Classification of fraudulent and legitimate credit card transactions using machine learning"
 authors = [
-  { name = "Group 27", email = "your@email.com" },
+  { name = "Christos Psallidas", email = "s253542@dtu.dk" },
+  { name = "Dimitrios Dimitriou", email = "s253560@dtu.dk" },
+  { name = "Dionysios Sellinas", email = "s242973@dtu.dk" },
+  { name = "Georgios Fragkiadoulakis", email = "s242831@dtu.dk" },
 ]
 
 keywords = ["machine learning", "MLOps"]
