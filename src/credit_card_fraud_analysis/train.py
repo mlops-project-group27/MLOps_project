@@ -10,14 +10,16 @@ from torch.utils.data import Dataset
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import StandardScaler
-
+import typer
 import torch.nn as nn
 import torch.optim as optim
 
 from credit_card_fraud_analysis.data import transform_data, generate_train_data, preprocess_data
 from credit_card_fraud_analysis.model import Autoencoder
 
+app = typer.Typer()
 
+@app.command()
 def train():
     X_train, _, _, _, X_train_tensor, X_test_tensor = preprocess_data()
 
@@ -44,4 +46,4 @@ def train():
             print(f'Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.4f}')
 
 if __name__ == "__main__":
-    train()
+    app()

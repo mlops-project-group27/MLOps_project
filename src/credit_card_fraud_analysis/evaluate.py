@@ -17,6 +17,9 @@ import torch.optim as optim
 from credit_card_fraud_analysis.data import transform_data, generate_train_data, preprocess_data
 from credit_card_fraud_analysis.model import Autoencoder
 
+app = typer.Typer()
+
+@app.command()
 def evaluate():
     X_train, X_test, _, y_test, _, X_test_tensor = preprocess_data()
     autoencoder = Autoencoder(X_train.shape[1])
@@ -46,3 +49,6 @@ def evaluate():
     print(f"\nThreshold used: {threshold:.4f}")
     print(f"Number of anomalies detected: {np.sum(y_pred)}")
     print(f"Actual number of fraud cases: {np.sum(y_test)}")
+
+if __name__ == "__main__":
+    app()
