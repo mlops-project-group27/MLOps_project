@@ -17,12 +17,17 @@ import torch.optim as optim
 from credit_card_fraud_analysis.data import transform_data, generate_train_data, preprocess_data
 from credit_card_fraud_analysis.model import Autoencoder
 
+MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
+
 app = typer.Typer()
 
 @app.command()
 def evaluate():
     X_train, X_test, _, y_test, _, X_test_tensor = preprocess_data()
     autoencoder = Autoencoder(X_train.shape[1])
+    autoencoder.load_state_dict(
+        torch.load(MODELS_DIR / "autoencoder.pt", map_location=torch.device("cpu"))
+    )
 
     autoencoder.eval()
     with torch.no_grad():

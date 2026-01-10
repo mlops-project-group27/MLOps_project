@@ -17,6 +17,8 @@ import torch.optim as optim
 from credit_card_fraud_analysis.data import transform_data, generate_train_data, preprocess_data
 from credit_card_fraud_analysis.model import Autoencoder
 
+MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
+
 app = typer.Typer()
 
 @app.command()
@@ -44,6 +46,9 @@ def train():
 
         if (epoch + 1) % 10 == 0:
             print(f'Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.4f}')
+
+    model_path = MODELS_DIR / "autoencoder.pt"
+    torch.save(autoencoder.state_dict(), model_path)
 
 if __name__ == "__main__":
     app()
