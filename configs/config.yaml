@@ -41,5 +41,5 @@ evaluation:
 hydra:
   job:
     chdir: false
-  save_plots: true
+ 
 
