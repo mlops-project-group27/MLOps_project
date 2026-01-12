@@ -14,4 +14,3 @@ def load_config():
         ):
             return compose(config_name="config")
     return compose(config_name="config")
-
