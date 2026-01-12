@@ -39,7 +39,7 @@ A variety of models can be deployed but initially an Autoencoder that learns to 
 
 Model training is implemented using **PyTorch Lightning** to reduce boilerplate code abd enforec a clean seperation between model definition, optimization, and training logic. The autoencoder is implemented as a LightingModule, while training is manahged through the Lightning Trainer abstraction, enabling standardized logging,  checkpointing, and hardware-agnostic execution.
 
-Experiment tracking is handled using **Weighs & Biases (W&B)**. During training, step-level reconstruction losses as well as optimizer learning rates are logged automatically. Model checkpoints are saved usign a ModelCheckpoont callback, and the best-performing model is stored locally and tracked as an artifact. Each training run is versioned and linked to its coresponding metrics and cofniguration in the W&B dashboard.
+Experiment tracking is handled using **Weighs & Biases (W&B)**. During training, step-level reconstruction losses as well as optimizer learning rates are logged automatically. Model checkpoints are saved usign a ModelCheckpoont callback, and the best-performing model is stored locally and tracked as an artifact. Each training run is versioned and linked to its coresponding metrics and cofniguration in the W&B dashboard. Basic runtime profiling can be enabled via configuration using PyTorch Lightning's built-in profiler to identify potential training and data-loading bottlenecks.
 
 ---
 

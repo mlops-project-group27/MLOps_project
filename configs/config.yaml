@@ -16,6 +16,7 @@ training:
   optimizer: "Adam"
   weight_decay: 1e-5
   early_stopping_patience: 5
+  profiling: false 
 
 # PyTorch Lightning trainer settings
 trainer:

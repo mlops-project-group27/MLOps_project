@@ -77,6 +77,7 @@ def train():
         logger=wandb_logger,
         callbacks=callbacks,
         log_every_n_steps=10,
+        profiler="simple",
     )
 
     # 7) Train
