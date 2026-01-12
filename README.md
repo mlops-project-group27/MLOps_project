@@ -35,6 +35,12 @@ The Kaggle Credit Card Fraud Detection dataset containing 284,807 transactions m
 
 A variety of models can be deployed but initially an Autoencoder that learns to reconstruct normal (non-fraudulent) transactions. An Autoencoder is a neural network used for unsupervised anomaly detection by learning to compress and reconstruct data. In the context of credit card fraud, the model is trained exclusively on "normal" transactions to learn the standard patterns of legitimate behavior. When the model encounters a fraudulent transaction, it lacks the specialized knowledge to reconstruct it accurately, resulting in a significantly high reconstruction error, which serves as a clear signal to flag the transaction as suspicious. This approach is particularly valuable because it does not rely on a large set of labeled fraud examples, which are often rare in real-world datasets.
 
+## 5. Training Pipeline and Experiment Tracking
+
+Model training is implemented using **PyTorch Lightning** to reduce boilerplate code abd enforec a clean seperation between model definition, optimization, and training logic. The autoencoder is implemented as a LightingModule, while training is manahged through the Lightning Trainer abstraction, enabling standardized logging,  checkpointing, and hardware-agnostic execution.
+
+Experiment tracking is handled using **Weighs & Biases (W&B)**. During training, step-level reconstruction losses as well as optimizer learning rates are logged automatically. Model checkpoints are saved usign a ModelCheckpoont callback, and the best-performing model is stored locally and tracked as an artifact. Each training run is versioned and linked to its coresponding metrics and cofniguration in the W&B dashboard.
+
 ---
 
 # HOW TO RUN
