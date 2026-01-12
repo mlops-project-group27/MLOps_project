@@ -23,3 +23,7 @@ evaluation:
   model_filename: "autoencoder.pt"
   metrics: ["precision", "recall", "f1", "roc_auc"]
   save_plots: True
+
+hydra:
+  job:
+    chdir: false

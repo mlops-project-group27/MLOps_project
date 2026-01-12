@@ -4,22 +4,19 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 import typer
-import hydra
-from hydra import compose, initialize
+
 
 from credit_card_fraud_analysis.data import preprocess_data
-# Import your local modules
-from credit_card_fraud_analysis.data import preprocess_data
+from credit_card_fraud_analysis.hydra_config_loader import load_config
 from credit_card_fraud_analysis.model import Autoencoder
 
 MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 
 
 @app.command()
 def train():
-    with initialize(version_base="1.2", config_path="../../configs"):
-        config = compose(config_name="config")
+    config = load_config()
 
     torch.manual_seed(config.seed)
 
