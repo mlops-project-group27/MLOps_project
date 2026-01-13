@@ -45,25 +45,34 @@ Experiment tracking is handled using **Weighs & Biases (W&B)**. During training,
 
 # HOW TO RUN
 
-To download the dataset, follow these steps after cloning the repository:
-
-1. Make sure you have a **Kaggle API token** on your computer.  
-   Follow the official Kaggle guide to create and configure your token: [Kaggle API Guide](https://www.kaggle.com/docs/api).
-
-2. Run the dataset script to download the data:
-
+1. Setup environmet. Install dependencies:
 ```bash
-python src/credit_card_fraud_analysis/make_dataset.py
+pip install -r requirements.txt
 ```
 
-3. Run the training script:
+To download the dataset, follow these steps after cloning the repository:
+
+2. Make sure you have a **Kaggle API token** on your computer.  
+   Follow the official Kaggle guide to create and configure your token: [Kaggle API Guide](https://www.kaggle.com/docs/api).
+
+3. Run the dataset script to download the data:
 
 ```bash
-python src/credit_card_fraud_analysis/train.py
+PYTHONPATH=src python src/credit_card_fraud_analysis/make_dataset.py
+```
+4. If you want training runs to be logged to the wandb dahsboard:
+
+   `wandb login`
+ 
+
+3. Run the training script using PyTorch and wandb:
+
+```bash
+PYTHONPATH=src python src/credit_card_fraud_analysis/train_lightning.py
 ```
 
 4. Run the evaluate script:
 
 ```bash
-python src/credit_card_fraud_analysis/evaluate.py
+PYTHONPATH=src python src/credit_card_fraud_analysis/evaluate.py
 ```
