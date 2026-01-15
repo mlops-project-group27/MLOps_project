@@ -79,3 +79,4 @@ PYTHONPATH=src python src/credit_card_fraud_analysis/train_lightning.py
 ```bash
 PYTHONPATH=src python src/credit_card_fraud_analysis/evaluate.py
 ```
+
