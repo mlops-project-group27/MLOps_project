@@ -22,3 +22,4 @@ pytorch-lightning>=2.6.0
 pre-commit
 requests
 locust
+streamlit>=1.28.2
