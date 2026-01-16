@@ -61,6 +61,7 @@ To download the dataset, follow these steps after cloning the repository:
 
 ```bash
 PYTHONPATH=src python src/credit_card_fraud_analysis/make_dataset.py
+$env:PYTHONPATH="src"; python src/credit_card_fraud_analysis/make_dataset.py
 ```
 
 4. If you want training runs to be logged to the wandb dahsboard:
@@ -72,10 +73,12 @@ PYTHONPATH=src python src/credit_card_fraud_analysis/make_dataset.py
 
 ```bash
 PYTHONPATH=src python src/credit_card_fraud_analysis/train_lightning.py
+$env:PYTHONPATH="src"; python src/credit_card_fraud_analysis/train_lightning.py
 ```
 
 4. Run the evaluate script:
 
 ```bash
 PYTHONPATH=src python src/credit_card_fraud_analysis/evaluate.py
+$env:PYTHONPATH="src"; python python src/credit_card_fraud_analysis/evaluate.py
 ```
