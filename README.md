@@ -76,6 +76,12 @@ PYTHONPATH=src python src/credit_card_fraud_analysis/train_lightning.py
 $env:PYTHONPATH="src"; python src/credit_card_fraud_analysis/train_lightning.py
 ```
 
+4. Run frontend:
+
+```bash
+front\start_system.bat
+```
+
 4. Run the evaluate script:
 
 ```bash
