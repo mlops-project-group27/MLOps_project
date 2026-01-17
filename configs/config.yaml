@@ -42,7 +42,3 @@ evaluation:
 hydra:
   job:
     chdir: false
-
-
-
-

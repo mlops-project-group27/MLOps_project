@@ -20,4 +20,3 @@ RUN mkdir -p /app/models /app/reports/figures
 
 # Run training
 ENTRYPOINT ["python", "src/credit_card_fraud_analysis/train.py"]
-

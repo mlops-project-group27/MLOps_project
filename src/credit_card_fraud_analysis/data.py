@@ -86,9 +86,7 @@ def generate_train_data(df):
 
     # 2. Split first: 70% train, 30% test
     # This keeps the test set "unseen" and realistically imbalanced.
-    X_train_raw, X_test, y_train_raw, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=0, stratify=y
-    )
+    X_train_raw, X_test, y_train_raw, y_test = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
 
     # 3. Apply SMOTE ONLY to the training data
     method = SMOTE(random_state=42)
