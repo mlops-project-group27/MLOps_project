@@ -1,6 +1,7 @@
 # src/credit_card_fraud_analysis/train_lightning.py
 from pathlib import Path
 
+import pandas as pd
 import pytorch_lightning as pl
 import torch
 import typer
@@ -13,6 +14,7 @@ from credit_card_fraud_analysis.data import preprocess_data
 from credit_card_fraud_analysis.hydra_config_loader import load_config
 from credit_card_fraud_analysis.lightning_module import LitAutoEncoder
 from credit_card_fraud_analysis.utils.my_logger import logger
+import onnxruntime as rt
 
 MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
 app = typer.Typer()
@@ -32,6 +34,10 @@ def train():
         logger.info("Starting data preprocessing...")
         X_train, _, _, _, X_train_tensor, _ = preprocess_data()
         logger.info(f"Data preprocessing complete. Training data shape: {X_train_tensor.shape}")
+
+        reference_df = pd.DataFrame(X_train)
+        reference_df.to_csv(MODELS_DIR / "reference_data.csv", index=False)
+        logger.info("Reference data saved for drift monitoring.")
 
         # 2) Create DataLoader
         logger.debug(f"Creating DataLoader with batch size: {config.training.batch_size}")
@@ -106,9 +112,31 @@ def train():
         # 7) Train
         logger.info("Starting training loop")
         trainer.fit(model, train_loader)
+        onnx_file_path = MODELS_DIR / "model.onnx"
+        optimized_onnx_file_path = MODELS_DIR / "optimized_model.onnx"
+        input_sample = torch.randn(1, input_dim)  # Dynamic input based on data
+
+        model.to_onnx(
+            onnx_file_path,
+            input_sample,
+            export_params=True,
+            opset_version=11,
+            input_names=['input'],
+            output_names=['output'],
+            # Allow variable batch sizes like in onnx_benchmark.py
+            dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
+
+        onnx_str_path = str(onnx_file_path)
+        optimized_str_path = str(optimized_onnx_file_path)
+        sess_options = rt.SessionOptions()
+        sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
+        sess_options.optimized_model_filepath = optimized_str_path
+        rt.InferenceSession(onnx_str_path, sess_options)
+        logger.info(f"Offline optimized model saved to: {optimized_onnx_file_path}")
+
         logger.info("Training completed successfully")
 
-        logger.info(f"Training complete. Best checkpoint saved to: {MODELS_DIR}")
+        logger.info(f"ONNX model exported to {onnx_file_path}")
         
     except Exception as e:
         logger.exception(f"Error during training: {e}")

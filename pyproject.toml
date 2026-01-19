@@ -30,11 +30,19 @@ line-length = 120
 select = ["I", "F", "E"]
 
 [tool.coverage.run]
-source = ["src/credit_card_fraud_analysis"]
+source = ["src"]
 omit = [
-    "src/tests/*",
-    "**/__init__.py",
+  "src/tests/*",
+  "**/__init__.py",
+
+  # CLI / entrypoints (not unit-tested)
+  "src/credit_card_fraud_analysis/train.py",
+  "src/credit_card_fraud_analysis/train_lightning.py",
+  "src/credit_card_fraud_analysis/train_lightning2.py",
+  "src/credit_card_fraud_analysis/make_dataset.py",
+  "src/credit_card_fraud_analysis/api.py",
 ]
+
 
 [tool.coverage.report]
 show_missing = true

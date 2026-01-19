@@ -1,5 +1,6 @@
-from loguru import logger
 import sys
+
+from loguru import logger
 
 # Configure log level (INFO is default)
 logger.add("logs/app.log", rotation="100 MB", level="DEBUG")
@@ -14,6 +15,6 @@ logger.add(sys.stderr, level="DEBUG")  # terminal
 
 # Integrate with Hydra
 import os
+
 hydra_log_dir = os.getcwd()  # Hydra changes working directory
 logger.add(f"{hydra_log_dir}/app.log", rotation="100 MB")
-

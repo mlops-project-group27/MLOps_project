@@ -194,3 +194,5 @@ cython_debug/
 
 # experiment logs
 wandb/
+.venv/
+/data
