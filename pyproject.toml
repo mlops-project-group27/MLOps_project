@@ -25,9 +25,14 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.ruff]
 line-length = 120
+src = ["src"]
 
 [tool.ruff.lint]
 select = ["I", "F", "E"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["credit_card_fraud_analysis"]
+combine-as-imports = true
 
 [tool.coverage.run]
 source = ["src"]
