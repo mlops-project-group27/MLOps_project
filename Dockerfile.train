@@ -1,0 +1,7 @@
+FROM mlops-dataset:latest
+
+ENV PYTHONPATH="/app/src:${PYTHONPATH}"
+
+COPY configs/ configs/
+
+CMD ["python", "src/credit_card_fraud_analysis/train_lightning.py"]
