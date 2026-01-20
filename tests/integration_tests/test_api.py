@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from credit_card_fraud_analysis.api import app
 
 

@@ -1,19 +1,19 @@
 # src/credit_card_fraud_analysis/train_lightning.py
 from pathlib import Path
 
+import onnxruntime as rt
 import pandas as pd
 import pytorch_lightning as pl
 import torch
 import typer
-from hydra import compose, initialize
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader
+
+from credit_card_fraud_analysis.data import MyDataset, preprocess_data
 from credit_card_fraud_analysis.hydra_config_loader import load_config
 from credit_card_fraud_analysis.lightning_module import LitAutoEncoder
 from credit_card_fraud_analysis.utils.my_logger import logger
-import onnxruntime as rt
-from credit_card_fraud_analysis.data import MyDataset, preprocess_data
 
 MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
 app = typer.Typer()
@@ -60,8 +60,14 @@ def train():
             lr=config.training.lr,
             weight_decay=config.training.weight_decay,
         )
-        logger.info(f"Model initialized - Input dim: {input_dim}, Hidden dim: {config.model.hidden_dim}, LR: {config.training.lr}")
-        
+        logger.info(
+            (
+                f"Model initialized - Input dim: {input_dim}, "
+                f"Hidden dim: {config.model.hidden_dim}, "
+                f"LR: {config.training.lr}"
+            )
+        )
+
         # Check for potential issues
         if config.training.lr < 0.001:
             logger.warning(f"Learning rate is very low: {config.training.lr}")
@@ -70,7 +76,7 @@ def train():
         wandb_project = getattr(config, "wandb", {}).get("project", "mlops-credit-card-fraud")
         wandb_name = getattr(config, "wandb", {}).get("name", "lit-autoencoder")
         logger.info(f"Setting up W&B logger - Project: {wandb_project}, Name: {wandb_name}")
-        
+
         wandb_logger = WandbLogger(
             project=wandb_project,
             name=wandb_name,
@@ -97,8 +103,10 @@ def train():
         # 6) Trainer
         device_type = "cpu" if config.device == "cpu" else "auto"
         logger.info(f"Starting training on device: {device_type}")
-        logger.debug(f"Training configuration - Epochs: {config.training.epochs}, Batch size: {config.training.batch_size}")
-        
+        logger.debug(
+            f"Training configuration - Epochs: {config.training.epochs}, Batch size: {config.training.batch_size}"
+        )
+
         trainer = pl.Trainer(
             max_epochs=config.training.epochs,
             accelerator=device_type,
@@ -121,10 +129,11 @@ def train():
             input_sample,
             export_params=True,
             opset_version=11,
-            input_names=['input'],
-            output_names=['output'],
+            input_names=["input"],
+            output_names=["output"],
             # Allow variable batch sizes like in onnx_benchmark.py
-            dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
+            dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+        )
 
         onnx_str_path = str(onnx_file_path)
         optimized_str_path = str(optimized_onnx_file_path)
@@ -137,7 +146,7 @@ def train():
         logger.info("Training completed successfully")
 
         logger.info(f"ONNX model exported to {onnx_file_path}")
-        
+
     except Exception as e:
         logger.exception(f"Error during training: {e}")
         logger.error("Something went wrong in training process")

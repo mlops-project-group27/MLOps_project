@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+27
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s242973, s242831, s253542, s253560
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -148,7 +148,15 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 3 fill here ---
+We used **EvidentlyAI** to perform data drift detection by comparing reference data collected during training with data observed at inference time.
+
+For configuration management, we used **Hydra**, which simplified experiment configuration and enabled clean seperation between code and hyperparametrs.
+
+We also used **Typer** to implement command-line interfaces for training and evaluation scripts, providing a consistent and user-freindly way to run
+project components.
+
+Finnaly, we used **Weights & Bias** for experiment tracking, enabling logging of training metrics, configuration parameters, and model artifacts, which
+supported systematic experimentation and comparison across runs.
 
 ## Coding environment
 
@@ -168,7 +176,16 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 4 fill here ---
+We managed project dependencies using a combination of `pyproject.toml` and the `uv` package manager, which allowed us to maintain a reproducible
+and well-defined Python environment. All direct dependencies are declared in `pyproject.toml`, while exact, resolved versions are pinned in the
+automatically generated `uv.lock` file.
+
+For local development, a new team memmber ca recreate the environment by first installing `uv` and then running `uv sync`, which installs all
+dependencies exaclty as specified in the lock file. Development-specific dependecies, such as testing and linitng tools, are included in a seperate
+dependency group to keep the runtime environment minimal.
+
+Dependencies are als reprorudef in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
+same dependency specifications, ensuring consistency between local development, continuous integration, and deployment.
 
 ### Question 5
 
@@ -184,7 +201,20 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 5 fill here ---
+The project was initialized using the official cookiecutter template provided in the course, which defined the overall structure of the repository.
+We retained the core layout, including the `src/` directory for source code, `tests/` for automated testing, `configs/` for configuration files, and
+`data/` for raw and processed datasets.
+
+The main project logic was implemented inside the `src/credit)card_fraud_analysis` package, including data handlign, model definition, training,
+evaluation, and an API for inference. The `tests/` directory was extended with unit, integration, and performance tests to validate components
+of the pipeline.
+
+We also added a `dockerfiles/` directory containing seperate Dockerfiles for training, inference, and the API, as well as a Cloud Build configuration
+for automated training. A `reports/` directory was included for the exam report, and `docs/` was exneted with project documentation and profilling
+notes.
+
+Overall, the cookiecuter structure was preservec, while additional fodlers and files were introduced to support deployment, monitoring, and
+reproducability requirements.
 
 ### Question 6
 
@@ -199,7 +229,18 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 6 fill here ---
+We implemented explixit rules for code quality and formatting to ensure consistency and maintainability throught the project. Code style and linting were
+enforced using **Ruff**, which was configured in `pyproject.toml` and integrated both as a **pre-commit hook** and as part of our **CI workfllows**. This
+ensured that common issued such as unused imports, inconsistent formatting, and style violations were automatically detected both locally before commits
+and remotely during CI.
+
+Formatting was handled usign `ruff format`, guaranteeing a uniform code style across all contributors without relying on manual enforcements. In addition,
+core modules include **docstrings** that describe the purpose of the tests, functions, and training components, improving readability and easing onboarding
+for new contributors.
+
+We did not enforce strict static type checking, we focused on practical documentation and automated wuality checks that scale well with project size. These
+pracitces are especially important in larger projects, where multiples contributions workd in parallel, as they reduce technical debt, improve code readabilit
+, and prevent subtle errors from propagating unnoticed through the codebase.
 
 ## Version control
 
@@ -218,7 +259,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 7 fill here ---
+In total, we implemented **11 test files in total**, covering unit, integration, and performance testing. Unit tests validate critical components such as
+data loading, model construction, forward passes, training, evaluation, and configuration handling. We also implemented both API unit tests and API
+integrations tests, the latter explixitly testing FastAPIA lifespan events, model loading, and error handling for invalid inputs.
+
+Additionally, we included a **performance test suite using Locust** to evaluate request latency and system behaviour under load.
 
 ### Question 8
 
@@ -233,7 +278,16 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of our project is approximately **45%**. This coverage mainly reflects the parts of the system that are most critical for
+correctness and stability, including data preprocessing, model inference, API endpoints, configuration loading, and core utility functions.
+Several modules with low or zero coverage correspond to training scripts, Lightning training pipelines, dataset creation utilities,
+and scalability experiments, which are not executed during normal inference or deployment and are therefore less critical for runtime reliability.
+
+Even if our code had close to 100% coverage, we would not consider it fully error-free. High coverage only indicates that lines of code were executed,
+not that all edge cases, failure modes, or logical errors were correctly handled. In particular, integration issues, performance bottlenecks,
+numerical instability, and unexpected data distributions can still cause failures despite full coverage. For this reason, code coverage
+should be viewed as one quality indicator among others, and it must be complemented by integration tests, monitoring, logging,
+and validation on real or adversarial data.
 
 ### Question 9
 
@@ -247,8 +301,13 @@ will check the repositories and the code to verify your answers.
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
-
---- question 9 fill here ---
+Yes, our workflow included the use of branches and pull requests. During the project, new features and fixes were developed on separate branches instead
+of directly on the main branch. Each branch focused on a specific task, such as adding tests, improving the CI pipeline, profiling performance, adding
+Docker support, or updating dependencies.
+When a task was completed, the changes were merged into the main branch using pull requests. This allowed us to review the changes run automated tests,
+nd make sure the code worked correctly before merging. The Git history shows several merged pull requests from feature branches, which confirms that
+this workflow was actively used.
+After the pull requests were merged, the feature branches were removed. This helped keep the repository clean and easier to manage.
 
 ### Question 10
 
@@ -263,7 +322,13 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 10 fill here ---
+Yes, we used DVC for managing data in our project. The raw and processed datasets are tracked using DVC instead of Git, while Git only stores small
+metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
+We configured a remote DVC storage using Google Cloud Storage (GCS). This allows all team members a remote DVC storage using Google Cloud Storage (GCS).
+This allows all team members and CI pipelines to pull pipelines to pull the exact same version of the data when checking out a specific Git commit.
+As a result, experiments can be reproduced reliably, since the code version and the corresponding data version are always aligned.
+Using DVC also made it easy to detect whether data had changed and whether retraining or re-running experiments was required. This was especially
+useful when datasets evolved during development.
 
 ### Question 11
 
