@@ -1,6 +1,5 @@
 import pytest
 import torch
-
 from credit_card_fraud_analysis.model import Autoencoder
 
 

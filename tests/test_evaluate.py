@@ -3,9 +3,8 @@
 from pathlib import Path
 
 import pytest
-from typer.testing import CliRunner
-
 from credit_card_fraud_analysis.data import RAW_DATA_DIR
+from typer.testing import CliRunner
 
 DATA_FILE = RAW_DATA_DIR / "creditcard.csv"
 runner = CliRunner()

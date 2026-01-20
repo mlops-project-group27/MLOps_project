@@ -1,6 +1,5 @@
-from fastapi.testclient import TestClient
-
 from credit_card_fraud_analysis.api import app
+from fastapi.testclient import TestClient
 
 
 def test_predict_success():

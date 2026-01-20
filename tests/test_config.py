@@ -1,5 +1,4 @@
 import pytest
-
 from credit_card_fraud_analysis.hydra_config_loader import load_config
 
 
