@@ -345,7 +345,20 @@ useful when datasets evolved during development.
 >
 > Answer:
 
---- question 11 fill here ---
+We use GitHub Actions to implement continuous integration (CI) for our project. The CI pipeline is automatically triggered on every `push` and `pull_request` to the
+`main` branch, ensuring that new changes are continuously vaildated before being merged.
+
+Our CI setup covers code quality checks, formatting, and automated testing. In particular, we run static code analysis and import/format consistency checks using Ruff,
+followed  by unit and integration tests using Pytest. This ensures that code adheres to a consistent style and that functional beahvior is verified automatically.
+
+To ensure robustness and portability, our CI workflow runs across mutliple operating systems (`ubuntu-latest`, `windows-latest`, and `macos-latest`) and multiple
+Python versions (Python 3.11 and 3.12) using a matrix strategy. This helps detect OS- or versio-specific issues early and improves reproducability across environments.
+
+We also make use of dependency caching by `actions/setup-python`, caching pip dependencies based on `requirements.txt` and `requirements_dev.txt`. This significantly
+reduces CI excecution time by avoiding dependency installations across runs.
+
+An exampl of a triggered workflow can be found here
+<https://github.com/mlops-project-group27/MLOps_project/actions/runs/21176597297>
 
 ## Running code and tracking experiments
 
