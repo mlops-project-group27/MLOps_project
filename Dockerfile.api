@@ -1,0 +1,8 @@
+FROM mlops-dataset:latest
+
+ENV PYTHONPATH="/app/src:${PYTHONPATH}"
+
+ENV PYTHONUNBUFFERED=1
+EXPOSE 8080
+
+CMD ["uvicorn", "credit_card_fraud_analysis.api:app", "--host", "0.0.0.0", "--port", "8080"]

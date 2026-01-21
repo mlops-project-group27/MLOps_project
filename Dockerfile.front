@@ -1,0 +1,11 @@
+FROM mlops-dataset:latest
+
+ENV PYTHONPATH="/app/src:${PYTHONPATH}"
+
+COPY front/ front/
+
+EXPOSE 8501
+
+ENV BACKEND_URL=http://backend:8080
+
+CMD ["streamlit", "run", "front/frontend.py", "--server.port=8501", "--server.address=0.0.0.0"]
