@@ -655,11 +655,18 @@ A monitoring system for the credit card fraud detection application was implemen
 >
 > Answer:
 
-During the project development, our **4-member team (Group 27)** utilized several GCP services for the MLOps pipeline. While specific credit amounts weren't tracked individually per member, the team collectively used approximately **50-100 credits** throughout the project development phase.
+We did not calculate credits usage per person, since we worked on the project created by one of us. Totally we used 1.51$ splitted as follows:
+- Compute Engine: 1.387$
+- VM Manager: 0.039$
+- Networking: 0.039$
+- Artifact Registry: 0.037$
+- Cloud Monitoring: 0.001$
 
-The most expensive service was likely **Google Cloud Build** due to frequent Docker image builds for the training pipeline and API deployment, followed by Artifact Registry for storing multiple **Docker images** (training, API, and frontend containers). Google Cloud Storage for **DVC** remote storage was relatively inexpensive, consuming minimal storage costs for the credit card fraud dataset.
+The vast majority of our cost was for the Compute Engine. This is an expected cost allocation, since it held the bulk of our cloud endeavors. VM manager, networking and artifact registry were services we actually used, in a secondary manner, thus their costs are significantly lower. Cloud Monitoring was minimal and it is reflected in the costs. Overall the total cost was really small, as was expected from a project of this size, combined with the fact that we mostly worked locally, and only in the later parts did we implement the app in the cloud.
 
-Working in the cloud provided significant benefits including seamless collaboration through shared storage, automated **CI/CD** pipelines, and scalable deployment options via Cloud Run. However, the learning curve for GCP services and managing costs required careful monitoring. The cloud infrastructure enabled us to implement a complete MLOps workflow with version control, automated training, and production deployment that wouldn't have been feasible with local resources alone.
+Working in the cloud was an interesting experience. We gained hands on experience in its capabilities and how to utilize them. It helped use resources properly and efficiently.
+
+![credits usage analysis](figures/credits.png)
 
 ### Question 28
 
