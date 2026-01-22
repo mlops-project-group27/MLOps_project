@@ -513,7 +513,9 @@ In the Registry we stored the images we created. Tagging the images and then doc
 >
 > Answer:
 
-Compute Engine was the most important part of our cloud operations, which acted as the connecting component to the other services. We created one VM in one account. There we cloned the repo, run all processes (dataset collection, model training, backend and frontend) and dockerized them. We also tested the networking of our app, exposing it in a public IP in order to access the frontend, hosted in the cloud, from our local personal computers.
+Compute Engine was the central component of our cloud operations, serving as the main hub that connected all other services. We created a single Virtual Machine within our Google Cloud account, which acted as the primary environment for implementing and testing our entire application. On this VM, we cloned the project repository and executed all necessary processes, including dataset collection, model training, and running both the backend and frontend components.
+
+We also dockerized each part of the application to ensure reproducibility and portability across environments. Beyond simply running the containers, we thoroughly tested the networking of our system by assigning a public IP to the VM. This setup allowed us to access the frontend, hosted in the cloud, directly from our local personal computers while ensuring proper connectivity with the backend. Overall, Compute Engine provided the flexible infrastructure needed to orchestrate and validate the entire cloud-based pipeline.
 
 ### Question 19
 
@@ -555,7 +557,7 @@ Not implemented
 >
 > Answer:
 
-We did manage to train the model fully in Compute Engine. Specifically, in the Virtual Machine we created, we ran the process to train the model, as we did locally. We did not use a specialized model training infrastracture, but rather the general infrastructure the Virtual Machine offers. We chose this approach because we wanted to use cloud infrastructure in general, not specifically for the model training but for the entire application. Thus it was thw approach that offered what we needed, in a broad aspect, not trictly related to the model.
+We did manage to train the model fully in Compute Engine. Specifically, in the Virtual Machine we created, we ran the process to train the model, as we did locally. We did not use a specialized model training infrastracture, but rather the general infrastructure the Virtual Machine offers. We chose this approach because we wanted to use cloud infrastructure in general (cloud offered resources, networking, experimenting with how a cloud project works), not specifically for the model training but for the entire application. Thus it was the approach that offered what we needed, in a broad aspect, not trictly related to the model.
 
 ## Deployment
 
