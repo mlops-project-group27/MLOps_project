@@ -353,8 +353,8 @@ We use GitHub Actions to implement continuous integration (CI) for our project. 
 `main` branch, ensuring that all new code is validated against our quality standards before being merged.
 
 Our CI setup is divided into several logical stages to ensure code health. First, we perform linting and formatting checks using
-`Ruff`. This allows us to catch syntax errors, unused imports, and style inconsistencies instantly. Following the linting stage, 
-we execute our comprehensive test suite using `Pytest`. This includes both unit tests for individual functions and 
+`Ruff`. This allows us to catch syntax errors, unused imports, and style inconsistencies instantly. Following the linting stage,
+we execute our comprehensive test suite using `Pytest`. This includes both unit tests for individual functions and
 integration tests to verify that our machine learning components work together seamlessly.
 
 To ensure robustness and portability, our CI workflow runs across multiple operating systems (`ubuntu-latest`, `windows-latest`, and `macos-latest`) and multiple
