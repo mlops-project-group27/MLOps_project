@@ -16,6 +16,9 @@ FRONTEND_IMG=mlops-front
 
 NETWORK=mlops-net
 
+docker volume create mlops-data >/dev/null
+docker volume create mlops-models >/dev/null
+
 # Create network if missing
 docker network inspect $NETWORK >/dev/null 2>&1 || docker network create $NETWORK
 
@@ -39,35 +42,35 @@ pull_or_build () {
 pull_or_build \
   europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/mlops-dataset:latest \
   $DATASET_IMG \
-  docker/Dockerfile.dataset
+  dockerfiles/Dockerfile.dataset
 
 pull_or_build \
   europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/mlops-train:latest \
   $TRAIN_IMG \
-  docker/Dockerfile.train
+  dockerfiles/Dockerfile.train
 
 pull_or_build \
   europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/mlops-api:latest \
   $BACKEND_IMG \
-  docker/Dockerfile.api
+  dockerfiles/Dockerfile.api
 
 pull_or_build \
   europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/mlops-front:latest \
   $FRONTEND_IMG \
-  docker/Dockerfile.front
+  dockerfiles/Dockerfile.front
 
 # ---- DATASET ----
 echo " Running dataset container"
 docker run --rm \
   --network $NETWORK \
-  -v $(pwd)/dataset:/app/dataset \
+  -v $(pwd)/dataset:/app/data/raw \
   $DATASET_IMG
 
 # ---- TRAINING ----
 echo " Training model"
 docker run --rm \
   --network $NETWORK \
-  -v $(pwd)/dataset:/app/dataset \
+  -v $(pwd)/dataset:/app/data/raw \
   -v $(pwd)/models:/app/models \
   $TRAIN_IMG
 
