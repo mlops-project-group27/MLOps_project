@@ -1,46 +1,38 @@
-import numpy as np
-import torch
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
-from pydantic import BaseModel
-from typing import List
 from pathlib import Path
+from typing import List
+
+import numpy as np
+import onnx
+import torch
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from prometheus_client import CollectorRegistry, Counter, Histogram, Summary, make_asgi_app
+from pydantic import BaseModel
+
 from credit_card_fraud_analysis.hydra_config_loader import load_config
 from credit_card_fraud_analysis.lightning_module import LitAutoEncoder
-import onnxruntime as ort
-import onnx
-from credit_card_fraud_analysis.utils.my_logger import logger
-from prometheus_client import CollectorRegistry, Counter, Histogram, Summary, make_asgi_app
 from credit_card_fraud_analysis.monitoring_utils import generate_drift_report, log_to_database
-from fastapi.responses import HTMLResponse
-from fastapi import BackgroundTasks
+from credit_card_fraud_analysis.utils.my_logger import logger
+
+try:
+    import onnxruntime as ort
+except ModuleNotFoundError:
+    ort = None
+
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 MODELS_DIR = BASE_DIR / "models"
 
 MY_REGISTRY = CollectorRegistry()
 
-error_counter = Counter(
-    "prediction_error",
-    "Number of prediction errors",
-    registry=MY_REGISTRY
-)
-request_counter = Counter(
-    "prediction_requests",
-    "Number of prediction requests",
-    registry=MY_REGISTRY
-)
-request_latency = Histogram(
-    "prediction_latency_seconds",
-    "Prediction latency in seconds",
-    registry=MY_REGISTRY
-)
+error_counter = Counter("prediction_error", "Number of prediction errors", registry=MY_REGISTRY)
+request_counter = Counter("prediction_requests", "Number of prediction requests", registry=MY_REGISTRY)
+request_latency = Histogram("prediction_latency_seconds", "Prediction latency in seconds", registry=MY_REGISTRY)
 # Using Summary to track the distribution of input feature lengths
 feature_summary = Summary(
-    "feature_length_summary",
-    "Summary of the number of features in requests",
-    registry=MY_REGISTRY
+    "feature_length_summary", "Summary of the number of features in requests", registry=MY_REGISTRY
 )
+
 
 class TransactionRequest(BaseModel):
     features: List[float]
@@ -77,7 +69,7 @@ async def lifespan(app: FastAPI):
             target_model_path = None
             logger.error("No ONNX files found in the models directory.")
 
-    if target_model_path:
+    if target_model_path and ort is not None:
         try:
             model_str_path = str(target_model_path)
 
@@ -92,6 +84,11 @@ async def lifespan(app: FastAPI):
             # logger.debug(onnx.printer.to_text(onnx_model.graph))
         except Exception as e:
             logger.error(f"Failed to initialize ONNX session or checker: {e}")
+            app.state.ort_session = None
+    else:
+        app.state.ort_session = None
+        if target_model_path and ort is not None:
+            logger.warning("ONNX model found but onnxruntime is not installed.")
 
     logger.info("Loading configurations")
     try:
@@ -101,20 +98,29 @@ async def lifespan(app: FastAPI):
         app.state.threshold = 0.005
 
     quant_path = MODELS_DIR / "optimized_model.onnx"
-    if quant_path.exists():
+    if quant_path.exists() and ort is None:
         logger.info("Loading Quantized ONNX model for /predict_optimized")
         app.state.ort_session_quant = ort.InferenceSession(str(quant_path))
     else:
-        logger.warning("Quantized model not found. /predict_optimized will fail.")
+        app.state.ort_session_quant = None
+        if quant_path.exists():
+            logger.warning("Quantized model found but onnxruntime is not installed")
+        else:
+            logger.warning("Quantized model not found. /predict_optimized will fail.")
 
     yield
     # Cleanup
-    if app.state.model: del app.state.model
-    if app.state.ort_session: del app.state.ort_session
+    if app.state.model:
+        del app.state.model
+    if app.state.ort_session:
+        del app.state.ort_session
+    if app.state.ort_session_quant:
+        del app.state.ort_session_quant
 
 
 app = FastAPI(title="Credit Card Fraud API", lifespan=lifespan)
 app.mount("/metrics", make_asgi_app(registry=MY_REGISTRY))
+
 
 @app.get("/")
 def root():
@@ -122,7 +128,9 @@ def root():
 
 
 @app.post("/predict")
-async def predict(request: Request, data: TransactionRequest, background_tasks: BackgroundTasks, use_onnx: bool = True):
+async def predict(
+    request: Request, data: TransactionRequest, background_tasks: BackgroundTasks, use_onnx: bool = False
+):
     # Track request count
     request_counter.inc()
     # Measure latency of the prediction process
@@ -131,10 +139,22 @@ async def predict(request: Request, data: TransactionRequest, background_tasks: 
             # Observe the input data complexity
             feature_summary.observe(len(data.features))
 
+            expected_dim = 28
+            if len(data.features) != expected_dim:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Dimension mismatch: expected {expected_dim} features, got {len(data.features)}",
+                )
+
             threshold = request.app.state.threshold
             mse_loss = 0
 
             if use_onnx:
+                if ort is None:
+                    raise HTTPException(
+                        status_code=500, detail="onnxrutime is not installed. Install it to enable ONNX iference."
+                    )
+
                 session = request.app.state.ort_session
                 if not session:
                     raise HTTPException(status_code=503, detail="ONNX session not available")
@@ -154,17 +174,12 @@ async def predict(request: Request, data: TransactionRequest, background_tasks: 
                     mse_loss = torch.mean((input_tensor - reconstruction) ** 2).item()
 
             is_fraud = bool(mse_loss > request.app.state.threshold)
-            background_tasks.add_task(
-                log_to_database,
-                data.features,
-                float(mse_loss),
-                is_fraud
-            )
+            background_tasks.add_task(log_to_database, data.features, float(mse_loss), is_fraud)
 
             return {
                 "is_fraud": bool(mse_loss > threshold),
                 "reconstruction_error": float(mse_loss),
-                "engine": "onnx" if use_onnx else "pytorch"
+                "engine": "onnx" if use_onnx else "pytorch",
             }
 
         except Exception as e:
@@ -184,6 +199,9 @@ def monitoring():
 
 @app.post("/predict_optimized")
 async def predict_optimized(data: TransactionRequest, background_tasks: BackgroundTasks):
+    if ort is None or app.state.ort_session_quant is None:
+        raise HTTPException(status_code=503, detail="Quantized ONNX session not available.")
+
     try:
         session = app.state.ort_session_quant
         input_data = np.array([data.features], dtype=np.float32)
@@ -196,18 +214,13 @@ async def predict_optimized(data: TransactionRequest, background_tasks: Backgrou
 
         is_fraud = bool(mse_loss > app.state.threshold)
 
-        background_tasks.add_task(
-            log_to_database,
-            data.features,
-            float(mse_loss),
-            is_fraud
-        )
+        background_tasks.add_task(log_to_database, data.features, float(mse_loss), is_fraud)
 
         return {
             "is_fraud": is_fraud,
             "reconstruction_error": float(mse_loss),
             "engine": "onnx_quantized_8bit",
-            "optimization_techniques": ["pruning", "quantization"]
+            "optimization_techniques": ["pruning", "quantization"],
         }
     except Exception as e:
         error_counter.inc()

@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+27
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s242973, s242831, s253542, s253560
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -148,7 +148,15 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 3 fill here ---
+We used **EvidentlyAI** to perform data drift detection by comparing reference data collected during training with data observed at inference time.
+
+For configuration management, we used **Hydra**, which simplified experiment configuration and enabled clean seperation between code and hyperparametrs.
+
+We also used **Typer** to implement command-line interfaces for training and evaluation scripts, providing a consistent and user-freindly way to run
+project components.
+
+Finnaly, we used **Weights & Bias** for experiment tracking, enabling logging of training metrics, configuration parameters, and model artifacts, which
+supported systematic experimentation and comparison across runs.
 
 ## Coding environment
 
@@ -168,7 +176,16 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 4 fill here ---
+We managed project dependencies using a combination of `pyproject.toml` and the `uv` package manager, which allowed us to maintain a reproducible
+and well-defined Python environment. All direct dependencies are declared in `pyproject.toml`, while exact, resolved versions are pinned in the
+automatically generated `uv.lock` file.
+
+For local development, a new team memmber ca recreate the environment by first installing `uv` and then running `uv sync`, which installs all
+dependencies exaclty as specified in the lock file. Development-specific dependecies, such as testing and linitng tools, are included in a seperate
+dependency group to keep the runtime environment minimal.
+
+Dependencies are als reprorudef in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
+same dependency specifications, ensuring consistency between local development, continuous integration, and deployment.
 
 ### Question 5
 
@@ -184,7 +201,20 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 5 fill here ---
+The project was initialized using the official cookiecutter template provided in the course, which defined the overall structure of the repository.
+We retained the core layout, including the `src/` directory for source code, `tests/` for automated testing, `configs/` for configuration files, and
+`data/` for raw and processed datasets.
+
+The main project logic was implemented inside the `src/credit)card_fraud_analysis` package, including data handlign, model definition, training,
+evaluation, and an API for inference. The `tests/` directory was extended with unit, integration, and performance tests to validate components
+of the pipeline.
+
+We also added a `dockerfiles/` directory containing seperate Dockerfiles for training, inference, and the API, as well as a Cloud Build configuration
+for automated training. A `reports/` directory was included for the exam report, and `docs/` was exneted with project documentation and profilling
+notes.
+
+Overall, the cookiecuter structure was preservec, while additional fodlers and files were introduced to support deployment, monitoring, and
+reproducability requirements.
 
 ### Question 6
 
@@ -199,7 +229,18 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 6 fill here ---
+We implemented explixit rules for code quality and formatting to ensure consistency and maintainability throught the project. Code style and linting were
+enforced using **Ruff**, which was configured in `pyproject.toml` and integrated both as a **pre-commit hook** and as part of our **CI workfllows**. This
+ensured that common issued such as unused imports, inconsistent formatting, and style violations were automatically detected both locally before commits
+and remotely during CI.
+
+Formatting was handled usign `ruff format`, guaranteeing a uniform code style across all contributors without relying on manual enforcements. In addition,
+core modules include **docstrings** that describe the purpose of the tests, functions, and training components, improving readability and easing onboarding
+for new contributors.
+
+We did not enforce strict static type checking, we focused on practical documentation and automated wuality checks that scale well with project size. These
+pracitces are especially important in larger projects, where multiples contributions workd in parallel, as they reduce technical debt, improve code readabilit
+, and prevent subtle errors from propagating unnoticed through the codebase.
 
 ## Version control
 
@@ -218,7 +259,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 7 fill here ---
+In total, we implemented **11 test files in total**, covering unit, integration, and performance testing. Unit tests validate critical components such as
+data loading, model construction, forward passes, training, evaluation, and configuration handling. We also implemented both API unit tests and API
+integrations tests, the latter explixitly testing FastAPIA lifespan events, model loading, and error handling for invalid inputs.
+
+Additionally, we included a **performance test suite using Locust** to evaluate request latency and system behaviour under load.
 
 ### Question 8
 
@@ -233,7 +278,16 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of our project is approximately **45%**. This coverage mainly reflects the parts of the system that are most critical for
+correctness and stability, including data preprocessing, model inference, API endpoints, configuration loading, and core utility functions.
+Several modules with low or zero coverage correspond to training scripts, Lightning training pipelines, dataset creation utilities,
+and scalability experiments, which are not executed during normal inference or deployment and are therefore less critical for runtime reliability.
+
+Even if our code had close to 100% coverage, we would not consider it fully error-free. High coverage only indicates that lines of code were executed,
+not that all edge cases, failure modes, or logical errors were correctly handled. In particular, integration issues, performance bottlenecks,
+numerical instability, and unexpected data distributions can still cause failures despite full coverage. For this reason, code coverage
+should be viewed as one quality indicator among others, and it must be complemented by integration tests, monitoring, logging,
+and validation on real or adversarial data.
 
 ### Question 9
 
@@ -247,8 +301,13 @@ will check the repositories and the code to verify your answers.
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
-
---- question 9 fill here ---
+Yes, our workflow included the use of branches and pull requests. During the project, new features and fixes were developed on separate branches instead
+of directly on the main branch. Each branch focused on a specific task, such as adding tests, improving the CI pipeline, profiling performance, adding
+Docker support, or updating dependencies.
+When a task was completed, the changes were merged into the main branch using pull requests. This allowed us to review the changes run automated tests,
+nd make sure the code worked correctly before merging. The Git history shows several merged pull requests from feature branches, which confirms that
+this workflow was actively used.
+After the pull requests were merged, the feature branches were removed. This helped keep the repository clean and easier to manage.
 
 ### Question 10
 
@@ -263,7 +322,13 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 10 fill here ---
+Yes, we used DVC for managing data in our project. The raw and processed datasets are tracked using DVC instead of Git, while Git only stores small
+metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
+We configured a remote DVC storage using Google Cloud Storage (GCS). This allows all team members a remote DVC storage using Google Cloud Storage (GCS).
+This allows all team members and CI pipelines to pull pipelines to pull the exact same version of the data when checking out a specific Git commit.
+As a result, experiments can be reproduced reliably, since the code version and the corresponding data version are always aligned.
+Using DVC also made it easy to detect whether data had changed and whether retraining or re-running experiments was required. This was especially
+useful when datasets evolved during development.
 
 ### Question 11
 
@@ -280,7 +345,20 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 11 fill here ---
+We use GitHub Actions to implement continuous integration (CI) for our project. The CI pipeline is automatically triggered on every `push` and `pull_request` to the
+`main` branch, ensuring that new changes are continuously vaildated before being merged.
+
+Our CI setup covers code quality checks, formatting, and automated testing. In particular, we run static code analysis and import/format consistency checks using Ruff,
+followed  by unit and integration tests using Pytest. This ensures that code adheres to a consistent style and that functional beahvior is verified automatically.
+
+To ensure robustness and portability, our CI workflow runs across mutliple operating systems (`ubuntu-latest`, `windows-latest`, and `macos-latest`) and multiple
+Python versions (Python 3.11 and 3.12) using a matrix strategy. This helps detect OS- or versio-specific issues early and improves reproducability across environments.
+
+We also make use of dependency caching by `actions/setup-python`, caching pip dependencies based on `requirements.txt` and `requirements_dev.txt`. This significantly
+reduces CI excecution time by avoiding dependency installations across runs.
+
+An exampl of a triggered workflow can be found here
+<https://github.com/mlops-project-group27/MLOps_project/actions/runs/21176597297>
 
 ## Running code and tracking experiments
 
@@ -299,7 +377,16 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 12 fill here ---
+**Hydra** was used for experiment configuration combined with a `config.yaml`, which centralizes all hyperparameters regarding model architecture, training and evaluation procedures, wandb logging. This approach eliminates hardcoded values and ensures reproducibility. 
+To run an experiment with the default settings:
+```bash
+python src/credit_card_fraud_analysis/train_lightning.
+```
+It also possible to dynamically execute an experiment by overriding arguments (for example changing the learning rate, batch size, device)
+```bash
+python src/credit_card_fraud_analysis/train_lightning.py training.lr=0.005 training.batch_size=512 device="cuda"
+```
+
 
 ### Question 13
 
@@ -314,7 +401,12 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 13 fill here ---
+For ensuring full reproducibility and preventing information loss, configuration and logging tools have been utilized such as **Hydra, Logging (Loguru), PyTorch Lightning, and Weights & Biases (W&B)**.
+- Centralized Configuration:  All hyperparameters, from seeds to architecture dimensions, are stored in `config.yaml`. A hydra config loader (`hydra_config_loader.py`) was implemented for locating the configuration and initializing Hydra
+- Consistent results: Specified seed in `torch.manual_seed` and configure the Lightning Trainer with `deterministic: true`
+- Automated Experiment Tracking: We use WandbLogger to automatically log metrics, model checkpoints, and the system configuration to the WANDB cloud. Additionally, the trainer uses a `profiler="simple"` to log performance bottlenecks, ensuring the experiment's execution environment is well-documented. In addition, a custom loguru logger has been implemented for logging purposes.
+- Model Versioning: Model checkpoint are used for monitoring the train_loss metric and saving the model state. Also, optimization code is being executed using **ONNX** (dynamic axes for varying batch sizes, optimizing the computational graph of the model) and forecasting and sharing machine learning models.
+
 
 ### Question 14
 
@@ -331,7 +423,14 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 14 fill here ---
+To ensure the success and reproducibility of our experiments, we have integrated **Weights & Biases (W&B)** for real-time tracking and visualization. As seen in the **Charts** image ![my_image](figures/wb_charts.png), we track the following metrics:
+- train_loss_step and train_loss_epoch: These plots display the Mean Squared Error (MSE) reconstruction loss decreasing over time. Because an autoencoder is trained to reconstruct normal transactions, a consistently declining loss(ending at 0.0686 in our run) indicates the model is successfully capturing the latent structure of the data
+- lr-Adam: Learning rate it remains stable at **0.001** as configured in our config.yaml. This ensures that the optimizer is behaving as expected and that no unexpected scheduling issues occurred during the run
+- epoch: This verifies the training progression through all 30 planned epochs, providing a timeline for performance improvements
+As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure reproducibility by capturing the exact environment:
+- Configuration Parameters: W&B automatically snapshots the config.yaml hyperparameters, such as `hidden_dim: 32, dropout: 0.1, and weight_decay: 1e-5`
+- Git State: The system logs the specific Git commit hash and branch, ensuring we can link results to a exact version of the code
+- System Hardware: It records hardware details, such as the logical **CPU count (16)**, which is essential for diagnosing the data-loading bottlenecks identified in our profiler report
 
 ### Question 15
 
@@ -452,7 +551,13 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 23 fill here ---
+The project successfully implemented and deployed a high-performance FastAPI service for credit card fraud detection. The system is designed to handle inference using both PyTorch and optimized ONNX backends. The api.py file uses an asynchronous lifespan manager to handle resource initialization. Upon startup, it automatically scans the /models directory for the most recent PyTorch checkpoints (.ckpt) and ONNX files. It prioritizes loading an optimized ONNX model for low-latency inference. 
+
+The API exposes four primary endpoints:
+- `/predict`: The standard fraud detection endpoint that calculates reconstruction error for predicting if a transaction is fraudulent or not
+- `/predict_optimized`: optimized predictions using a quantized 8-bit ONNX model, which reduces latency and memory usage
+- `/monitoring`: Generates a JSON data drift report by comparing live request data against the training reference data
+- `/`: verify the service status
 
 ### Question 24
 
@@ -468,8 +573,13 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 24 fill here ---
+For development and local testing, the service is served using **Uvicorn**: ```bash python -m uvicorn src.credit_card_fraud_analysis.api:app --reload```This environment includes a integrated Prometheus metrics registry at `/metrics` to track request latency and error rates
+For deploying the application in cloud as **Google Run Cloud** function a Dockerfile was created to package application code, dependencies (**onnxruntime and torch**), and the exported model files. A Docker image was built and pushed to `europe-west1-docker.pkg.dev` artifact registry and then instructions were provided for **Google Cloud Platform (GCP)** to take the containerized API and run it as a web service
+The deployment was done using the following command
+```bash gcloud run deploy gcp-test-service --image europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/gcp_test_app:latest --platform managed --region europe-west1 --allow-unauthenticated```
 
+![my_image](figures/gcp_cloud_run.png)
+![my_image](figures/gcp_cloud_run_commands.png)
 ### Question 25
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
@@ -483,7 +593,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 25 fill here ---
+Unit testing, integration testing and performance load testing was implemented to ensure the reliability and scalability of the API
+- For unit testing, **Pytest** was utilized to validate individual components  and test credit card fraud detection system. They validate Hydra configurations for type safety, ensure data preprocessing correctly handles SMOTE and tensor shapes, and verify the Autoencoder architecture via forward passes and weight updates. The suite also includes tests for model imports, anomaly detection thresholding logic and weights update correctly during training
+- For performance load testing, **Locust** was employed to simulate concurrent users interacting with the API. A custom predict_fraud class generated realistic requests with random feature values, targeting the `/predict` endpoint with high frequency. This allowed the developer to monitor response times, throughput, and failure rates. This allowed to observe response times, throughput, and failure rates
+- Integration testing focuses on the API application using **FastAPI’s TestClient and Pytest**. These tests simulate real HTTP requests to the `/predict` endpoint, triggering startup events like model loading. The suite verifies successful fraud detection predictions, ensures the system handles feature dimension mismatches with 400 errors, and validates that malformed inputs trigger appropriate 422 validation errors
+
 
 ### Question 26
 
@@ -498,7 +612,10 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 26 fill here ---
+A monitoring system for the credit card fraud detection application was implemented based on three key components: real-time metrics, data drift analysis, and background logging. Monitoring improves the longevity of the application by enabling early detection of performance and operational issues, allowing model retraining or code optimization before failures impact users.
+**Monitoring Implementation**
+- Real-time Performance Metrics: The application utilizes Prometheus to monitors request counts, prediction latencies using Histograms observe response-time distributions, and input feature complexity through Summaries. The total number of prediction requests are recorded to monitor traffic and usage patterns, as well as the number of prediction errors to quickly identify failures or unstable behavior.  These metrics are exposed via a `/metrics` endpoint
+- Data Drift Monitoring: A dedicated `/monitoring` endpoint generates drift reports by comparing incoming production data against a saved reference_data.csv. This allows the system to detect shifts in data distributions that might degrade model accuracy over time. By generating a drift report on demand, we can identify shifts in feature distributions that may degrade model performance over time. In addition, background tasks are used to asynchronously log input features, reconstruction errors, and prediction outcomes to a database file without affecting API latency
 
 ## Overall discussion of project
 
@@ -517,7 +634,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 27 fill here ---
+During the project development, our 4-member team (Group 27) utilized several GCP services for the MLOps pipeline. While specific credit amounts weren't tracked individually per member, the team collectively used approximately 50-100 credits throughout the project development phase.
+
+The most expensive service was likely Cloud Build due to frequent Docker image builds for the training pipeline and API deployment, followed by Artifact Registry for storing multiple Docker images (training, API, and frontend containers). Google Cloud Storage for DVC remote storage was relatively inexpensive, consuming minimal storage costs for the credit card fraud dataset.
+
+Working in the cloud provided significant benefits including seamless collaboration through shared storage, automated CI/CD pipelines, and scalable deployment options via Cloud Run. However, the learning curve for GCP services and managing costs required careful monitoring. The cloud infrastructure enabled us to implement a complete MLOps workflow with version control, automated training, and production deployment that wouldn't have been feasible with local resources alone.
 
 ### Question 28
 
@@ -533,7 +654,17 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 28 fill here ---
+We implemented several extra features in our project beyond the standard requirements:
+
+Streamlit Frontend: We created a comprehensive web interface using Streamlit that provides an interactive user experience for credit card fraud detection. The frontend includes multiple input methods (manual entry, sample transactions, CSV upload), real-time fraud predictions with visual risk indicators, and detailed error analysis with charts. We implemented this to make the model accessible to non-technical users and demonstrate the practical application.
+
+Data Drift Detection Service: We implemented a monitoring system using the Evidently library that tracks data drift between reference and current data. The API exposes a /monitoring endpoint that generates drift reports in JSON format, allowing real-time monitoring of model performance degradation.
+
+Comprehensive Prometheus Metrics: Beyond basic API monitoring, we instrumented our FastAPI application with detailed metrics including request counters, latency histograms, error counters, and feature summary statistics. The metrics are exposed via a /metrics endpoint for integration with monitoring systems.
+
+Model Optimization Pipeline: We implemented model pruning and ONNX optimization (scalable.py) with dynamic quantization to improve inference performance, reducing model size while maintaining accuracy.
+
+These features enhance the production-readiness and user experience of our MLOps pipeline.
 
 ### Question 29
 
@@ -550,7 +681,15 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 29 fill here ---
+The starting point of our [MLOps architecture](figures/q29.png) is our local development setup, where we integrated PyTorch Lightning for model development, Hydra for configuration management, Weights & Biases for experiment tracking, and DVC for data version control. Our development environment includes comprehensive testing suites, Docker containers for reproducible deployments, and pre-commit hooks for code quality.
+
+Whenever we commit code and push to GitHub, it automatically triggers multiple CI/CD workflows through GitHub Actions. These include unit testing across multiple operating systems (Ubuntu, Windows, macOS) and Python versions (3.11, 3.12), code linting with Ruff, Docker image building, and specialized workflows for data and model changes. The data change workflow uses DVC to validate data integrity and generates automated reports using CML.
+
+From GitHub, our pipeline integrates with Google Cloud Platform services. We use Cloud Storage as the remote backend for DVC to store our credit card fraud dataset. Cloud Build automatically builds and pushes Docker images to the Artifact Registry whenever code changes are detected. We maintain separate containers for training (train.dockerfile), API inference (api.dockerfile), and the Streamlit frontend (frontend.dockerfile).
+
+The deployment phase utilizes Cloud Run to host both our FastAPI backend and Streamlit frontend as serverless containers. The backend provides fraud prediction endpoints with Prometheus monitoring, data drift detection using Evidently, and ONNX optimization for improved inference performance. The frontend offers an intuitive web interface for users to input transaction data and receive fraud predictions with detailed visualizations.
+
+Users access the system through their web browsers, where they can analyze transactions using multiple input methods (manual entry, CSV upload, or sample data). The architecture supports real-time predictions, model monitoring, and automatic scaling based on demand. The entire pipeline ensures reproducibility, continuous integration, and seamless deployment from development to production.
 
 ### Question 30
 
@@ -564,7 +703,17 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 30 fill here ---
+The biggest challenges in our project revolved around environment consistency and deployment complexity. With a team of 4 members working across different operating systems, we spent considerable time ensuring that the same code worked reliably on Windows, macOS, and Linux. The path handling differences became particularly problematic when setting up the PYTHONPATH for imports, which led us to create platform-specific launch scripts (start_system.bat) and implement cross-platform compatibility in our tasks.py using the WINDOWS = os.name == "nt" flag.
+
+Docker configuration presented another significant hurdle. We struggled with getting the correct module paths working inside containers, especially for the API deployment. The initial api.dockerfile had incorrect import paths (src.api.main:app instead of src.credit_card_fraud_analysis.api:app), which caused numerous failed deployments. We overcame this by implementing comprehensive integration tests and adding proper error handling to catch these issues early.
+
+Google Cloud Platform integration consumed substantial development time. Setting up DVC with GCS storage, configuring service accounts for Cloud Build, and managing artifact registry permissions were more complex than anticipated. The authentication between local development, GitHub Actions, and GCP services required careful coordination of secrets management and IAM roles.
+
+CI/CD pipeline complexity grew beyond our initial expectations. Implementing matrix testing across multiple OS and Python versions, while maintaining reasonable execution times required extensive caching strategies and workflow optimization. We had to balance thorough testing with CI cost considerations.
+
+The frontend-backend communication also presented challenges, particularly with environment variable management and service discovery. We solved this by implementing robust error handling and creating fallback mechanisms for backend URL resolution.
+
+To overcome these challenges, we adopted a systematic debugging approach using comprehensive logging, extensive unit and integration testing, and incremental deployment strategies. The implementation of dev containers significantly improved development environment consistency and reduced setup friction for team members.
 
 ### Question 31
 
@@ -582,4 +731,6 @@ will check the repositories and the code to verify your answers.
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+All four team members - s242973 (Dionysios Sellinas), s253542 (Christos Psallidas), s253560 (Dimitrios Dimitriou), and s242831 (Georgios Fragkiadoulakis) - contributed equally to the project development. The team collaboratively worked on all major components including the initial cookiecutter project setup, cloud infrastructure configuration with GCP and DVC, PyTorch Lightning model development for credit card fraud detection, comprehensive CI/CD pipeline implementation with GitHub Actions, Docker containerization for training/API/frontend services, FastAPI backend development with Prometheus monitoring, Streamlit frontend creation, extensive testing strategies (unit, integration, and performance), cross-platform compatibility ensuring support for Windows/macOS/Linux, data version control setup, deployment automation, and comprehensive documentation. Each member participated in code reviews, debugging sessions, and quality assurance processes while maintaining consistent coding standards through pre-commit hooks and Ruff formatting.
+
+We extensively used GitHub Copilot for code completion and boilerplate generation, particularly helpful for writing comprehensive test suites and Docker configurations. ChatGPT was utilized for debugging complex configuration issues, especially with GCP authentication, CI/CD pipeline troubleshooting, and resolving environment-specific compatibility problems. We also used AI tools for optimizing our monitoring and logging implementations, and for generating comprehensive docstrings and code documentation.

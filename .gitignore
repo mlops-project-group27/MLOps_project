@@ -3,6 +3,9 @@ models/*
 
 reports/figures/*
 !reports/figures/.gitkeep
+!reports/figures/*.png
+!reports/figures/*.jpg
+!reports/figures/*.jpeg
 
 data/raw/*
 !data/raw/.gitkeep

@@ -1,12 +1,16 @@
-import numpy as np
-import pandas as pd
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import List
-from datetime import datetime, UTC
-from evidently import Report, Dataset, DataDefinition
-from evidently.presets import DataDriftPreset, DataSummaryPreset, DatasetStats
+
+import numpy as np
+import pandas as pd
+from evidently import Report
+from evidently.presets import DataDriftPreset, DataSummaryPreset
+
 from credit_card_fraud_analysis.utils.my_logger import logger
+
 LOG_FILE = Path("prediction_database.csv")
+
 
 def log_to_database(features: List[float], error: float, is_fraud: bool):
     now = datetime.now(tz=UTC).isoformat()
@@ -15,6 +19,7 @@ def log_to_database(features: List[float], error: float, is_fraud: bool):
 
     header = not LOG_FILE.exists()
     df.to_csv(LOG_FILE, mode="a", index=False, header=header)
+
 
 def generate_drift_report(reference_path: Path) -> str | None:
     """
@@ -57,15 +62,11 @@ def generate_drift_report(reference_path: Path) -> str | None:
     reference_data = reference_data[non_empty_cols]
     current_data = current_data[non_empty_cols]
 
-    report = Report([
-        DataDriftPreset(),
-        DataSummaryPreset()
-    ])
+    report = Report([DataDriftPreset(), DataSummaryPreset()])
 
     result = report.run(
         reference_data=reference_data,
         current_data=current_data,
-
     )
     logger.info(result)
 

@@ -1,4 +1,5 @@
 import random
+
 from locust import HttpUser, between, task
 
 
@@ -6,6 +7,7 @@ class FraudDetectionUser(HttpUser):
     """
     Simulates users interacting with the Credit Card Fraud Detection API.
     """
+
     # Wait between 1 and 5 seconds between tasks to simulate human behavior
     wait_time = between(1, 5)
 
@@ -23,10 +25,10 @@ class FraudDetectionUser(HttpUser):
 
         # ADD catch_response=True here
         with self.client.post(
-                "/predict",
-                json=payload,
-                name="/predict",
-                catch_response=True  # This is the required fix
+            "/predict",
+            json=payload,
+            name="/predict",
+            catch_response=True,  # This is the required fix
         ) as response:
             if response.status_code == 200:
                 response.success()
