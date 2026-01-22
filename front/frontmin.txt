@@ -2,7 +2,7 @@ front\start_system.bat
 
 ## Frontend Directory Overview
 
-The front directory contains all the user-facing components and utilities for the 
+The front directory contains all the user-facing components and utilities for the
 Credit Card Fraud Detection system. Here's what each file does:
 
 ### 🎯 Core Application Files

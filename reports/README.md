@@ -186,7 +186,7 @@ For local development, a new team member recreate the environment by first insta
 dependencies exactly as specified in the lock file. Development-specific dependencies, such as testing and linting tools, are included in a separate
 dependency file `requirements_dev.txt` to keep the runtime environment minimal.
 
-Dependencies are all preprocedure in containerized environments. The **Dockerfiles** used for training and inference install dependencies directly from the
+Dependencies are all reprorudec in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
 same dependency specifications, ensuring consistency between local development, continuous integration, and deployment.
 
 ### Question 5
@@ -239,6 +239,8 @@ and remotely during CI.
 Formatting was handled using `ruff format`, keeping a uniform code style across all contributors without relying on manual enforcements.  We did not enforce strict static type checking, we focused on practical documentation and automated quality checks that scale well with project size. These
 practices are especially important in larger projects, where multiples contributions worked in parallel, as they reduce technical debt, improve code readability, and prevent errors from propagating unnoticed through the codebase.
 
+![Pre-commit code quality checks passing](figures/pre_commit.png)
+
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -261,6 +263,8 @@ data loading, model construction, forward passes, training, evaluation, and conf
 integrations tests, where the latter explicitly defines testing FastAPI lifespan events, model loading, and error handling for invalid inputs.
 
 Finally, we included a **performance test suite using Locust** to mimic request latency and system behaviour under load.
+
+![Pytest test suite execution summary](figures/pytest_test.png)
 
 ### Question 8
 
@@ -285,6 +289,8 @@ not that all edge cases, failure modes, or logical errors were correctly handled
 numerical instability, and unexpected data distributions can still cause failures despite full coverage. For this reason, code coverage
 should be viewed as one quality indicator among others, and it must be complemented by integration tests, monitoring, logging,
 and validation on real or adversarial data.
+
+![Pytest code coverage summary](figures/code_coverage.png)
 
 ### Question 9
 
@@ -320,9 +326,13 @@ After the pull requests were merged, the feature branches were removed. This hel
 >
 > Answer:
 
+<<<<<<< HEAD
 **DVC** was utilized for managing data in our project. TInstead of storing large datasets directly in Git, raw and processed data are tracked with DVC, while Git only keeps small metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
 We configured a remote DVC storage using **Google Cloud Storage (GCS)**. This ensures that when a specific Git commit is checked out, the corresponding data can be retrieved, allowing experiments to be reliably reproduced since code and data versions are always synchronized.
 Additionally, DVC made it easy to track changes in the data, helping determine when retraining or rerunning experiments was necessary. This proved especially valuable as datasets evolved during development.
+
+
+![DVC-tracked datasets and remote storage](figures/dvc_tracking.png)
 
 ### Question 11
 
@@ -355,6 +365,10 @@ reduces CI execution time by avoiding dependency installations across runs.
 
 An example of a triggered workflow can be found here
 <https://github.com/mlops-project-group27/MLOps_project/actions/runs/21176597297>
+
+**CI pipeline execution example (GitHub Actions):**
+
+![GitHub Actions CI checks](reports/figures/git_hub_actions_checks.png)
 
 ## Running code and tracking experiments
 
