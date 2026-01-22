@@ -72,6 +72,7 @@ docker run --rm \
   --network $NETWORK \
   -v $(pwd)/dataset:/app/data/raw \
   -v $(pwd)/models:/app/models \
+  -e WANDB_API_KEY=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 \
   $TRAIN_IMG
 
 # ---- BACKEND ----
