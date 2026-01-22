@@ -70,7 +70,8 @@ The complete directory layout is shown below.
 │   └── unit tests
 ├── uv.lock
 └── wandb
-
+```
+</details>
 ## 2. Frameworks and Tools
 
 The project leverages the following technologies and tools:
@@ -118,6 +119,11 @@ Experiment tracking is handled using **Weights & Biases (W&B)**. During training
 ---
 
 # HOW TO RUN
+
+The easiest way to run the application is cloning the repo, and then running ```bash run.sh```
+This command builds all images and containers, then accessing http://localhost:8501 will provide access to the frontend and the entire app functionality.
+
+Otherwise, all processes can be run simply, without using Docker:
 
 
 1. Create a virtual environment. Install dependencies:
