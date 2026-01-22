@@ -309,7 +309,7 @@ Docker support, or updating dependencies.
 When a task was completed, the changes were merged into the main branch using pull requests. This allowed us to review the changes run automated tests,
 nd make sure the code worked correctly before merging. The Git history shows several merged pull requests from feature branches, which confirms that
 this workflow was actively used.
-After the pull requests were merged, the feature branches were removed. This helped keep the repository clean and easier to manage.
+After the pull requests were merged, the feature branches were removed. This helped keep the repository clean and easier to manage. For example, pre-commit tests and dockerization were fully developed in separate branches before being merged to main.
 
 ### Question 10
 
@@ -447,7 +447,17 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 15 fill here ---
+We fully containerized our application using Docker, structuring it into four main images:
+- Dataset – Downloads and stores the dataset properly.
+- Training – Trains the model and saves it to a persistent volume.
+- Backend – Serves the trained model via an API.
+- Frontend – Provides the user interface to interact with the backend.
+
+To orchestrate the entire system, we created a run.sh script, which automates several tasks:
+- Pulls the Docker images from Google Cloud Artifact Registry, or builds them locally if they are not available.
+- Creates the Docker network required for communication between the backend and frontend.
+- Creates the Docker volumes that each container uses to store or read data.
+- Runs the containers in the correct order, ensuring that the dataset is downloaded first, followed by training, backend, and finally frontend.
 
 ### Question 16
 
@@ -462,7 +472,11 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 16 fill here ---
+When running into bugs while executing our experiments, we followed a systematic debugging approach. We first reproduced the issue in a minimal environment to isolate the problem. We used logging, assertions, and print statements to inspect variables and trace execution flow. Additionally, we inspected container logs and used Docker exec to check the state inside containers when running our application in Docker.
+
+Pre commit tests and unit tests were also used to help us identify bugs and comply with proper formatting practices.
+
+Yes, we also profiled our code to identify performance bottlenecks, particularly during data preprocessing and model training. This helped us optimize critical sections and ensure that our experiments ran efficiently on both local machines and cloud infrastructure.
 
 ## Working in the cloud
 
@@ -479,7 +493,12 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 17 fill here ---
+Compute Engine:
+We used Copmute Engine to host a Virtual Machine in which we implemented our application and also tested the other cloud services.
+Bucket:
+We used Bucket to store our data.
+Artifact Registry:
+In the Registry we stored the images we created. Tagging the images and then docker pushing them to the registry.
 
 ### Question 18
 
@@ -494,7 +513,7 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 18 fill here ---
+Compute Engine was the most important part of our cloud operations, which acted as the connecting component to the other services. We created one VM in one account. There we cloned the repo, run all processes (dataset collection, model training, backend and frontend) and dockerized them. We also tested the networking of our app, exposing it in a public IP in order to access the frontend, hosted in the cloud, from our local personal computers.
 
 ### Question 19
 
@@ -503,7 +522,7 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 19 fill here ---
+![bucket screenshot](figures/my_bucket.png)
 
 ### Question 20
 
@@ -512,7 +531,7 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 20 fill here ---
+![registry screenshot, showing the images](figures/registry.png)
 
 ### Question 21
 
@@ -521,7 +540,7 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 21 fill here ---
+Not implemented
 
 ### Question 22
 
@@ -536,7 +555,7 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
---- question 22 fill here ---
+We did manage to train the model fully in Compute Engine. Specifically, in the Virtual Machine we created, we ran the process to train the model, as we did locally. We did not use a specialized model training infrastracture, but rather the general infrastructure the Virtual Machine offers. We chose this approach because we wanted to use cloud infrastructure in general, not specifically for the model training but for the entire application. Thus it was thw approach that offered what we needed, in a broad aspect, not trictly related to the model.
 
 ## Deployment
 
