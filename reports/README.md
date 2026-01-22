@@ -531,7 +531,7 @@ Compute Engine was the most important part of our cloud operations, which acted 
 >
 > Answer:
 
-![registry screenshot, showing the images](figures/registry.png)
+![registry screenshot, showing the images](figures/my_registry.png)
 
 ### Question 21
 
