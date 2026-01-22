@@ -377,7 +377,16 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 12 fill here ---
+**Hydra** was used for experiment configuration combined with a `config.yaml`, which centralizes all hyperparameters regarding model architecture, training and evaluation procedures, wandb logging. This approach eliminates hardcoded values and ensures reproducibility. 
+To run an experiment with the default settings:
+```bash
+python src/credit_card_fraud_analysis/train_lightning.
+```
+It also possible to dynamically execute an experiment by overriding arguments (for example changing the learning rate, batch size, device)
+```bash
+python src/credit_card_fraud_analysis/train_lightning.py training.lr=0.005 training.batch_size=512 device="cuda"
+```
+
 
 ### Question 13
 
@@ -392,7 +401,12 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 13 fill here ---
+For ensuring full reproducibility and preventing information loss, configuration and logging tools have been utilized such as **Hydra, Logging (Loguru), PyTorch Lightning, and Weights & Biases (W&B)**.
+- Centralized Configuration:  All hyperparameters, from seeds to architecture dimensions, are stored in `config.yaml`. A hydra config loader (`hydra_config_loader.py`) was implemented for locating the configuration and initializing Hydra
+- Consistent results: Specified seed in `torch.manual_seed` and configure the Lightning Trainer with `deterministic: true`
+- Automated Experiment Tracking: We use WandbLogger to automatically log metrics, model checkpoints, and the system configuration to the WANDB cloud. Additionally, the trainer uses a `profiler="simple"` to log performance bottlenecks, ensuring the experiment's execution environment is well-documented. In addition, a custom loguru logger has been implemented for logging purposes.
+- Model Versioning: Model checkpoint are used for monitoring the train_loss metric and saving the model state. Also, optimization code is being executed using **ONNX** (dynamic axes for varying batch sizes, optimizing the computational graph of the model) and forecasting and sharing machine learning models.
+
 
 ### Question 14
 
@@ -409,7 +423,14 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 14 fill here ---
+To ensure the success and reproducibility of our experiments, we have integrated **Weights & Biases (W&B)** for real-time tracking and visualization. As seen in the **Charts** image ![my_image](figures/wb_charts.png), we track the following metrics:
+- train_loss_step and train_loss_epoch: These plots display the Mean Squared Error (MSE) reconstruction loss decreasing over time. Because an autoencoder is trained to reconstruct normal transactions, a consistently declining loss(ending at 0.0686 in our run) indicates the model is successfully capturing the latent structure of the data
+- lr-Adam: Learning rate it remains stable at **0.001** as configured in our config.yaml. This ensures that the optimizer is behaving as expected and that no unexpected scheduling issues occurred during the run
+- epoch: This verifies the training progression through all 30 planned epochs, providing a timeline for performance improvements
+As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure reproducibility by capturing the exact environment:
+- Configuration Parameters: W&B automatically snapshots the config.yaml hyperparameters, such as `hidden_dim: 32, dropout: 0.1, and weight_decay: 1e-5`
+- Git State: The system logs the specific Git commit hash and branch, ensuring we can link results to a exact version of the code
+- System Hardware: It records hardware details, such as the logical **CPU count (16)**, which is essential for diagnosing the data-loading bottlenecks identified in our profiler report
 
 ### Question 15
 
@@ -530,7 +551,13 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 23 fill here ---
+The project successfully implemented and deployed a high-performance FastAPI service for credit card fraud detection. The system is designed to handle inference using both PyTorch and optimized ONNX backends. The api.py file uses an asynchronous lifespan manager to handle resource initialization. Upon startup, it automatically scans the /models directory for the most recent PyTorch checkpoints (.ckpt) and ONNX files. It prioritizes loading an optimized ONNX model for low-latency inference. 
+
+The API exposes four primary endpoints:
+- `/predict`: The standard fraud detection endpoint that calculates reconstruction error for predicting if a transaction is fraudulent or not
+- `/predict_optimized`: optimized predictions using a quantized 8-bit ONNX model, which reduces latency and memory usage
+- `/monitoring`: Generates a JSON data drift report by comparing live request data against the training reference data
+- `/`: verify the service status
 
 ### Question 24
 
@@ -546,8 +573,13 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 24 fill here ---
+For development and local testing, the service is served using **Uvicorn**: ```bash python -m uvicorn src.credit_card_fraud_analysis.api:app --reload```This environment includes a integrated Prometheus metrics registry at `/metrics` to track request latency and error rates
+For deploying the application in cloud as **Google Run Cloud** function a Dockerfile was created to package application code, dependencies (**onnxruntime and torch**), and the exported model files. A Docker image was built and pushed to `europe-west1-docker.pkg.dev` artifact registry and then instructions were provided for **Google Cloud Platform (GCP)** to take the containerized API and run it as a web service
+The deployment was done using the following command
+```bash gcloud run deploy gcp-test-service --image europe-west1-docker.pkg.dev/mlops-group27/mlops-docker/gcp_test_app:latest --platform managed --region europe-west1 --allow-unauthenticated```
 
+![my_image](figures/gcp_cloud_run.png)
+![my_image](figures/gcp_cloud_run_commands.png)
 ### Question 25
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
@@ -561,7 +593,11 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 25 fill here ---
+Unit testing, integration testing and performance load testing was implemented to ensure the reliability and scalability of the API
+- For unit testing, **Pytest** was utilized to validate individual components  and test credit card fraud detection system. They validate Hydra configurations for type safety, ensure data preprocessing correctly handles SMOTE and tensor shapes, and verify the Autoencoder architecture via forward passes and weight updates. The suite also includes tests for model imports, anomaly detection thresholding logic and weights update correctly during training
+- For performance load testing, **Locust** was employed to simulate concurrent users interacting with the API. A custom predict_fraud class generated realistic requests with random feature values, targeting the `/predict` endpoint with high frequency. This allowed the developer to monitor response times, throughput, and failure rates. This allowed to observe response times, throughput, and failure rates
+- Integration testing focuses on the API application using **FastAPI’s TestClient and Pytest**. These tests simulate real HTTP requests to the `/predict` endpoint, triggering startup events like model loading. The suite verifies successful fraud detection predictions, ensures the system handles feature dimension mismatches with 400 errors, and validates that malformed inputs trigger appropriate 422 validation errors
+
 
 ### Question 26
 
@@ -576,7 +612,10 @@ An exampl of a triggered workflow can be found here
 >
 > Answer:
 
---- question 26 fill here ---
+A monitoring system for the credit card fraud detection application was implemented based on three key components: real-time metrics, data drift analysis, and background logging. Monitoring improves the longevity of the application by enabling early detection of performance and operational issues, allowing model retraining or code optimization before failures impact users.
+**Monitoring Implementation**
+- Real-time Performance Metrics: The application utilizes Prometheus to monitors request counts, prediction latencies using Histograms observe response-time distributions, and input feature complexity through Summaries. The total number of prediction requests are recorded to monitor traffic and usage patterns, as well as the number of prediction errors to quickly identify failures or unstable behavior.  These metrics are exposed via a `/metrics` endpoint
+- Data Drift Monitoring: A dedicated `/monitoring` endpoint generates drift reports by comparing incoming production data against a saved reference_data.csv. This allows the system to detect shifts in data distributions that might degrade model accuracy over time. By generating a drift report on demand, we can identify shifts in feature distributions that may degrade model performance over time. In addition, background tasks are used to asynchronously log input features, reconstruction errors, and prediction outcomes to a database file without affecting API latency
 
 ## Overall discussion of project
 
