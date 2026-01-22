@@ -179,14 +179,14 @@ supported systematic experimentation and comparison across runs.
 > Answer:
 
 We managed project dependencies using a combination of `pyproject.toml`, `requirements.txt` and the `uv` package manager, which allowed us to maintain a reproducible
-and well-defined Python environment. All direct dependencies are declared in `requirements.txt`, while exact, resolved versions are pinned in the
+and well-defined **Python environment**. All direct dependencies are declared in `requirements.txt`, while exact, resolved versions are pinned in the
 automatically generated `uv.lock` file.
 
 For local development, a new team member recreate the environment by first installing `uv` and then running `uv pip install -r requirements.txt`, which installs all
 dependencies exactly as specified in the lock file. Development-specific dependencies, such as testing and linting tools, are included in a separate
 dependency file `requirements_dev.txt` to keep the runtime environment minimal.
 
-Dependencies are all reprorudec in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
+Dependencies are all reproducible in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
 same dependency specifications, ensuring consistency between local development, continuous integration, and deployment.
 
 ### Question 5
@@ -215,7 +215,7 @@ We also added a `dockerfiles/` directory containing separate **Dockerfiles** for
 for automated training. A `reports/` directory was included for the exam report, and `docs/` was extended with project documentation and profiling
 notes.
 
-Overall, the cookiecuter structure was preserve, while additional folders and files were introduced to support deployment, monitoring, and
+Overall, the **cookiecuter** structure was preserve, while additional folders and files were introduced to support deployment, monitoring, and
 reproducibility requirements.
 
 ### Question 6
@@ -260,7 +260,7 @@ practices are especially important in larger projects, where multiples contribut
 
 In total, we implemented **11 test files in total**, covering unit, integration, and performance testing. Unit tests validate critical components such as
 data loading, model construction, forward passes, training, evaluation, and configuration handling. We also implemented both API unit tests and API
-integrations tests, where the latter explicitly defines testing FastAPI lifespan events, model loading, and error handling for invalid inputs.
+integrations tests, where the latter explicitly defines testing **FastAPI lifespan** events, model loading, and error handling for invalid inputs.
 
 Finally, we included a **performance test suite using Locust** to mimic request latency and system behaviour under load.
 
@@ -279,7 +279,7 @@ Finally, we included a **performance test suite using Locust** to mimic request 
 >
 > Answer:
 
-The total code coverage of our project is approximately **45%**. This coverage mainly reflects the parts of the system that are most critical for
+The total **code coverage** of our project is approximately **45%**. This coverage mainly reflects the parts of the system that are most critical for
 the stability of our application, including data preprocessing, model inference, API endpoints, configuration loading, and core utility functions.
 Several modules with low or zero coverage correspond to **training scripts, Lightning training pipelines, dataset creation utilities,
 and scalability experiments**, which are not executed during normal inference or deployment and are therefore less critical for runtime reliability.
@@ -326,8 +326,7 @@ After the pull requests were merged, the feature branches were removed. This hel
 >
 > Answer:
 
-<<<<<<< HEAD
-**DVC** was utilized for managing data in our project. TInstead of storing large datasets directly in Git, raw and processed data are tracked with DVC, while Git only keeps small metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
+**DVC** was utilized for managing data in our project. Instead of storing large datasets directly in **Git**, raw and processed data are tracked with DVC, while Git only keeps small metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
 We configured a remote DVC storage using **Google Cloud Storage (GCS)**. This ensures that when a specific Git commit is checked out, the corresponding data can be retrieved, allowing experiments to be reliably reproduced since code and data versions are always synchronized.
 Additionally, DVC made it easy to track changes in the data, helping determine when retraining or rerunning experiments was necessary. This proved especially valuable as datasets evolved during development.
 
@@ -349,7 +348,7 @@ Additionally, DVC made it easy to track changes in the data, helping determine w
 >
 > Answer:
 
-We use GitHub Actions to implement continuous integration (CI) for our project. The CI pipeline is automatically triggered on every `push` and `pull_request` to the
+We use **GitHub Actions** to implement **continuous integration (CI)** for our project. The CI pipeline is automatically triggered on every `push` and `pull_request` to the
 `main` branch, ensuring that all new code is validated against our quality standards before being merged.
 
 Our CI setup is divided into several logical stages to ensure code health. First, we perform linting and formatting checks using
@@ -387,7 +386,7 @@ An example of a triggered workflow can be found here
 >
 > Answer:
 
-**Hydra** was used for experiment configuration combined with a `config.yaml`, which centralizes all hyperparameters regarding model architecture, training and evaluation procedures, wandb logging. This approach eliminates hardcoded values and ensures reproducibility.
+**Hydra** was used for experiment configuration combined with a `config.yaml`, which centralizes all **hyperparameters** regarding model architecture, training and evaluation procedures, wandb logging. This approach eliminates hardcoded values and ensures reproducibility.
 To run an experiment with the default settings:
 ```bash
 python src/credit_card_fraud_analysis/train_lightning.
@@ -414,7 +413,7 @@ python src/credit_card_fraud_analysis/train_lightning.py training.lr=0.005 train
 For ensuring full reproducibility and preventing information loss, configuration and logging tools have been utilized such as **Hydra, Logging (Loguru), PyTorch Lightning, and Weights & Biases (W&B)**.
 - Centralized Configuration:  All hyperparameters, from seeds to architecture dimensions, are stored in `config.yaml`. A hydra config loader (`hydra_config_loader.py`) was implemented for locating the configuration and initializing Hydra
 - Consistent results: Specified seed in `torch.manual_seed` and configure the Lightning Trainer with `deterministic: true`
-- Automated Experiment Tracking: We use WandbLogger to automatically log metrics, model checkpoints, and the system configuration to the WANDB cloud. Additionally, the trainer uses a `profiler="simple"` to log performance bottlenecks, ensuring the experiment's execution environment is well-documented. In addition, a custom loguru logger has been implemented for logging purposes.
+- Automated Experiment Tracking: We use WandbLogger to automatically log metrics, model checkpoints, and the system configuration to the WANDB cloud. Additionally, the trainer uses a `profiler="simple"` to log performance bottlenecks, ensuring the experiment's execution environment is well-documented. In addition, a custom `loguru` logger has been implemented for logging purposes.
 - Model Versioning: Model checkpoint are used for monitoring the train_loss metric and saving the model state. Also, optimization code is being executed using **ONNX** (dynamic axes for varying batch sizes, optimizing the computational graph of the model) and forecasting and sharing machine learning models.
 
 
@@ -434,8 +433,8 @@ For ensuring full reproducibility and preventing information loss, configuration
 > Answer:
 
 To ensure the success and reproducibility of our experiments, we have integrated **Weights & Biases (W&B)** for real-time tracking and visualization. As seen in the **Charts** image ![my_image](figures/wb_charts.png), we track the following metrics:
-- train_loss_step and train_loss_epoch: These plots display the Mean Squared Error (MSE) reconstruction loss decreasing over time. Because an autoencoder is trained to reconstruct normal transactions, a consistently declining loss(ending at 0.0686 in our run) indicates the model is successfully capturing the latent structure of the data
-- lr-Adam: Learning rate it remains stable at **0.001** as configured in our config.yaml. This ensures that the optimizer is behaving as expected and that no unexpected scheduling issues occurred during the run
+- train_loss_step and train_loss_epoch: These plots display the **Mean Squared Error (MSE)** reconstruction loss decreasing over time. Because an autoencoder is trained to reconstruct normal transactions, a consistently declining loss(ending at 0.0686 in our run) indicates the model is successfully capturing the latent structure of the data
+- lr-Adam: Learning rate it remains stable at **0.001** as configured in our `config.yaml`. This ensures that the optimizer is behaving as expected and that no unexpected scheduling issues occurred during the run
 - epoch: This verifies the training progression through all 30 planned epochs, providing a timeline for performance improvements
 As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure reproducibility by capturing the exact environment:
 - Configuration Parameters: W&B automatically snapshots the config.yaml hyperparameters, such as `hidden_dim: 32, dropout: 0.1, and weight_decay: 1e-5`
@@ -455,14 +454,14 @@ As seen in the **Overview** ![my_image](figures/wb_overview.png), we secure repr
 >
 > Answer:
 
-We fully containerized our application using Docker, structuring it into four main images:
-- Dataset – Downloads and stores the dataset properly.
-- Training – Trains the model and saves it to a persistent volume.
-- Backend – Serves the trained model via an API.
-- Frontend – Provides the user interface to interact with the backend.
+We fully containerized our application using **Docker**, structuring it into four main images:
+- Dataset: Downloads and stores the dataset properly.
+- Training: Trains the model and saves it to a persistent volume.
+- Backend: Serves the trained model via an API.
+- Frontend: Provides the user interface to interact with the backend.
 
 To orchestrate the entire system, we created a run.sh script, which automates several tasks:
-- Pulls the Docker images from Google Cloud Artifact Registry, or builds them locally if they are not available.
+- Pulls the Docker images from **Google Cloud Artifact Registry**, or builds them locally if they are not available.
 - Creates the Docker network required for communication between the backend and frontend.
 - Creates the Docker volumes that each container uses to store or read data.
 - Runs the containers in the correct order, ensuring that the dataset is downloaded first, followed by training, backend, and finally frontend.
@@ -480,11 +479,11 @@ To orchestrate the entire system, we created a run.sh script, which automates se
 >
 > Answer:
 
-When running into bugs while executing our experiments, we followed a systematic debugging approach. We first reproduced the issue in a minimal environment to isolate the problem. We used logging, assertions, and print statements to inspect variables and trace execution flow. Additionally, we inspected container logs and used Docker exec to check the state inside containers when running our application in Docker.
+When running into bugs while executing our experiments, we followed a systematic **debugging** approach. We first reproduced the issue in a minimal environment to isolate the problem. We used **logging, assertions, and print statements** to inspect variables and trace execution flow. Additionally, we inspected container logs and used `Docker exec` to check the state inside containers when running our application in **Docker**.
 
-Pre commit tests and unit tests were also used to help us identify bugs and comply with proper formatting practices.
+**Pre-commit tests and unit tests** were also used to help us identify bugs and comply with proper formatting practices.
 
-Yes, we also profiled our code to identify performance bottlenecks, particularly during data preprocessing and model training. This helped us optimize critical sections and ensure that our experiments ran efficiently on both local machines and cloud infrastructure.
+Finally, we also profiled our code to identify performance bottlenecks, particularly during data preprocessing and model training. This helped us optimize critical sections and ensure that our experiments ran efficiently on both local machines and cloud infrastructure.
 
 ## Working in the cloud
 
@@ -502,11 +501,11 @@ Yes, we also profiled our code to identify performance bottlenecks, particularly
 > Answer:
 
 Compute Engine:
-We used Copmute Engine to host a Virtual Machine in which we implemented our application and also tested the other cloud services.
-Bucket:
-We used Bucket to store our data.
-Artifact Registry:
-In the Registry we stored the images we created. Tagging the images and then docker pushing them to the registry.
+We used **Google Compute Engine** to host a Virtual Machine in which we implemented our application and also tested the other cloud services.
+**Bucket**:
+We used Cloud Storage Buckets to store and manage our application data securely and efficiently.
+**Artifact Registry**:
+We used Artifact Registry to store our Docker images. This allowed us to tag, manage, and deploy containerized versions of our application.
 
 ### Question 18
 
@@ -521,7 +520,7 @@ In the Registry we stored the images we created. Tagging the images and then doc
 >
 > Answer:
 
-Compute Engine was the central component of our cloud operations, serving as the main hub that connected all other services. We created a single Virtual Machine within our Google Cloud account, which acted as the primary environment for implementing and testing our entire application. On this VM, we cloned the project repository and executed all necessary processes, including dataset collection, model training, and running both the backend and frontend components.
+**Compute Engine** was the central component of our cloud operations, serving as the main hub that connected all other services. We created a single Virtual Machine within our Google Cloud account, which acted as the primary environment for implementing and testing our entire application. On this VM, we cloned the project repository and executed all necessary processes, including dataset collection, model training, and running both the backend and frontend components.
 
 We also dockerized each part of the application to ensure reproducibility and portability across environments. Beyond simply running the containers, we thoroughly tested the networking of our system by assigning a public IP to the VM. This setup allowed us to access the frontend, hosted in the cloud, directly from our local personal computers while ensuring proper connectivity with the backend. Overall, Compute Engine provided the flexible infrastructure needed to orchestrate and validate the entire cloud-based pipeline.
 
@@ -565,7 +564,7 @@ Not implemented
 >
 > Answer:
 
-We did manage to train the model fully in Compute Engine. Specifically, in the Virtual Machine we created, we ran the process to train the model, as we did locally. We did not use a specialized model training infrastracture, but rather the general infrastructure the Virtual Machine offers. We chose this approach because we wanted to use cloud infrastructure in general (cloud offered resources, networking, experimenting with how a cloud project works), not specifically for the model training but for the entire application. Thus it was the approach that offered what we needed, in a broad aspect, not trictly related to the model.
+We did manage to train the model fully in **Compute Engine**. Specifically, in the **Virtual Machine** we created, we ran the process to train the model, as we did locally. We did not use a specialized model training infrastructure, but rather the general infrastructure the **Virtual Machine** offers. We chose this approach because we wanted to use cloud infrastructure in general (cloud offered resources, networking, experimenting with how a cloud project works), not specifically for the model training but for the entire application. Thus, it was the approach that offered what we needed, in a broad aspect, not strictly related to the model.
 
 ## Deployment
 
@@ -624,10 +623,10 @@ The deployment was done using the following command
 >
 > Answer:
 
-Unit testing, integration testing and performance load testing was implemented to ensure the reliability and scalability of the API
-- For unit testing, **Pytest** was utilized to validate individual components  and test credit card fraud detection system. They validate Hydra configurations for type safety, ensure data preprocessing correctly handles SMOTE and tensor shapes, and verify the Autoencoder architecture via forward passes and weight updates. The suite also includes tests for model imports, anomaly detection thresholding logic and weights update correctly during training
+**Unit testing, integration testing and performance load testing** was implemented to ensure the reliability and scalability of the API
+- For unit testing, **Pytest** was utilized to validate individual components  and test credit card fraud detection system. They validate Hydra configurations for type safety, ensure data preprocessing correctly handles **SMOTE** and tensor shapes, and verify the **Autoencoder** architecture via forward passes and weight updates. The suite also includes tests for model imports, anomaly detection thresholding logic and weights update correctly during training
 - For performance load testing, **Locust** was employed to simulate concurrent users interacting with the API. A custom predict_fraud class generated realistic requests with random feature values, targeting the `/predict` endpoint with high frequency. This allowed the developer to monitor response times, throughput, and failure rates. This allowed to observe response times, throughput, and failure rates
-- Integration testing focuses on the API application using **FastAPI’s TestClient and Pytest**. These tests simulate real HTTP requests to the `/predict` endpoint, triggering startup events like model loading. The suite verifies successful fraud detection predictions, ensures the system handles feature dimension mismatches with 400 errors, and validates that malformed inputs trigger appropriate 422 validation errors
+- Integration testing focuses on the API application using **FastAPI’s TestClient and Pytest**. These tests simulate real HTTP requests to the `/predict` endpoint, triggering startup events like model loading. The suite verifies successful fraud detection predictions, ensures the system handles feature dimension mismatches with `400` errors, and validates that malformed inputs trigger appropriate `422` validation errors
 
 
 ### Question 26
@@ -645,8 +644,8 @@ Unit testing, integration testing and performance load testing was implemented t
 
 A monitoring system for the credit card fraud detection application was implemented based on three key components: real-time metrics, data drift analysis, and background logging. Monitoring improves the longevity of the application by enabling early detection of performance and operational issues, allowing model retraining or code optimization before failures impact users.
 **Monitoring Implementation**
-- Real-time Performance Metrics: The application utilizes Prometheus to monitors request counts, prediction latencies using Histograms observe response-time distributions, and input feature complexity through Summaries. The total number of prediction requests are recorded to monitor traffic and usage patterns, as well as the number of prediction errors to quickly identify failures or unstable behavior.  These metrics are exposed via a `/metrics` endpoint
-- Data Drift Monitoring: A dedicated `/monitoring` endpoint generates drift reports by comparing incoming production data against a saved reference_data.csv. This allows the system to detect shifts in data distributions that might degrade model accuracy over time. By generating a drift report on demand, we can identify shifts in feature distributions that may degrade model performance over time. In addition, background tasks are used to asynchronously log input features, reconstruction errors, and prediction outcomes to a database file without affecting API latency
+- Real-time Performance Metrics: The application utilizes **Prometheus** to monitors request counts, prediction latencies using Histograms observe response-time distributions, and input feature complexity through Summaries. The total number of prediction requests are recorded to monitor traffic and usage patterns, as well as the number of prediction errors to quickly identify failures or unstable behavior.  These metrics are exposed via a `/metrics` endpoint
+- Data Drift Monitoring: A dedicated `/monitoring` endpoint generates drift reports by comparing incoming production data against a saved reference_data.csv. This allows the system to detect shifts in data distributions that might degrade model accuracy over time. By generating a drift report on demand, we can identify shifts in feature distributions that may degrade model performance over time. In addition, **background tasks** are used to asynchronously log input features, reconstruction errors, and prediction outcomes to a database file without affecting API latency
 
 ## Overall discussion of project
 
@@ -665,16 +664,16 @@ A monitoring system for the credit card fraud detection application was implemen
 >
 > Answer:
 
-We did not calculate credits usage per person, since we worked on the project created by one of us. Totally we used 1.51$ splitted as follows:
-- Compute Engine: 1.387$
-- VM Manager: 0.039$
-- Networking: 0.039$
-- Artifact Registry: 0.037$
-- Cloud Monitoring: 0.001$
+We did not calculate credits usage per person, since we worked on the project created by one of us. Totally we used **1.51$** separated as follows:
+- Compute Engine: **1.387$**
+- VM Manager: **0.039$**
+- Networking: **0.039$**
+- Artifact Registry: **0.037$**
+- Cloud Monitoring: **0.001$**
 
-The vast majority of our cost was for the Compute Engine. This is an expected cost allocation, since it held the bulk of our cloud endeavors. VM manager, networking and artifact registry were services we actually used, in a secondary manner, thus their costs are significantly lower. Cloud Monitoring was minimal and it is reflected in the costs. Overall the total cost was really small, as was expected from a project of this size, combined with the fact that we mostly worked locally, and only in the later parts did we implement the app in the cloud.
+The vast majority of our cost was for the **Compute Engine**. This is an expected cost allocation, since it held the bulk of our cloud endeavors. VM manager, networking and artifact registry were services we actually used, in a secondary manner, thus their costs are significantly lower. **Cloud Monitoring** was minimal and it is reflected in the costs. Overall the total cost was minimal, as was expected from a project of this size, combined with the fact that we mostly worked locally, and only in the later parts did we implement the app in the cloud.
 
-Working in the cloud was an interesting experience. We gained hands on experience in its capabilities and how to utilize them. It helped use resources properly and efficiently.
+Working in the cloud was an interesting experience. We gained hands-on experience in its capabilities and how to utilize them. It helped use resources properly and efficiently.
 
 ![credits usage analysis](figures/credits.png)
 
@@ -723,7 +722,7 @@ The starting point of our MLOps architecture is our local development setup, whe
 
 Whenever we commit code and push to **GitHub**, it automatically triggers multiple CI/CD workflows through GitHub Actions. These include unit testing across multiple operating systems `(Ubuntu, Windows, macOS)` and `Python versions (3.11, 3.12)`, code linting with Ruff, Docker image building, and specialized workflows for data and model changes. The data change workflow uses DVC to validate data integrity and generates automated reports using CML.
 
-From GitHub, our pipeline integrates with **Google Cloud Platform** services. We use Cloud Storage as the remote backend for DVC to store our credit card fraud dataset. Cloud Build automatically builds and pushes **Docker** images to the **Artifact Registry** whenever code changes are detected. We maintain separate containers for training (`train.dockerfile`), API inference (`api.dockerfile`), and the Streamlit frontend (`frontend.dockerfile`).
+From **GitHub**, our pipeline integrates with **Google Cloud Platform** services. We use Cloud Storage as the remote backend for DVC to store our credit card fraud dataset. Cloud Build automatically builds and pushes **Docker** images to the **Artifact Registry** whenever code changes are detected. We maintain separate containers for training (`train.dockerfile`), API inference (`api.dockerfile`), and the Streamlit frontend (`frontend.dockerfile`).
 
 The deployment phase utilizes Cloud Run to host both our **FastAPI backend and Streamlit frontend** as serverless containers. The backend provides fraud prediction endpoints with **Prometheus** monitoring, data drift detection using Evidently, and **ONNX optimization** for improved prediction performance. The frontend offers an intuitive web interface for users to input transaction data and receive fraud predictions with detailed visualizations.
 
@@ -741,15 +740,15 @@ Users access the system through their web browsers, where they can analyze trans
 >
 > Answer:
 
-The biggest challenges in our project revolved around environment consistency and deployment complexity. With a team of 4 members working across different operating systems, we spent considerable time ensuring that the same code worked reliably on **Windows, macOS, and Linux**. The path handling differences became particularly problematic when setting up the `PYTHONPATH` for imports, which led us to create platform-specific launch scripts `(start_system.bat)` and implement cross-platform compatibility in our `tasks.py` using the `WINDOWS = os.name == "nt"` flag.
+The biggest challenges in our project revolved around environment consistency and deployment complexity. With a team of **4 members** working across different operating systems, we spent considerable time ensuring that the same code worked reliably on **Windows, macOS, and Linux**. The path handling differences became particularly problematic when setting up the `PYTHONPATH` for imports, which led us to create platform-specific launch scripts `(start_system.bat)` and implement cross-platform compatibility in our `tasks.py` using the `WINDOWS = os.name == "nt"` flag.
 
-Docker configuration presented another significant hurdle. We struggled with getting the correct module paths working inside containers, especially for the API deployment. The initial `api.dockerfile` had incorrect import paths (`src.api.main:app instead of src.credit_card_fraud_analysis.api:app`), which caused numerous failed deployments. We overcame this by implementing comprehensive integration tests and adding proper error handling to catch these issues early.
+**Docker** configuration presented another significant hurdle. We struggled with getting the correct module paths working inside containers, especially for the API deployment. The initial `api.dockerfile` had incorrect import paths (`src.api.main:app instead of src.credit_card_fraud_analysis.api:app`), which caused numerous failed deployments. We overcame this by implementing comprehensive integration tests and adding proper error handling to catch these issues early.
 
-Google Cloud Platform integration consumed substantial development time. Setting up DVC with **GCS storage**, and managing artifact registry permissions were more complex than anticipated. The authentication between local development, GitHub Actions, and GCP services required careful coordination of secrets management and IAM roles.
+**Google Cloud Platform** integration consumed substantial development time. Setting up DVC with **GCS storage**, and managing artifact registry permissions were more complex than anticipated. The authentication between local development, GitHub Actions, and GCP services required careful coordination of secrets management and IAM roles.
 
-CI/CD pipeline complexity grew beyond our initial expectations. Implementing matrix testing across multiple OS and Python versions, while maintaining reasonable execution times required extensive caching strategies and workflow optimization. We had to balance thorough testing with CI cost considerations.
+**CI/CD pipeline** complexity grew beyond our initial expectations. Implementing matrix testing across multiple OS and Python versions, while maintaining reasonable execution times required extensive caching strategies and workflow optimization. We had to balance thorough testing with CI cost considerations.
 
-The frontend-backend communication also presented challenges, particularly with environment variable management and service discovery. We solved this by implementing robust error handling and creating fallback mechanisms for backend URL resolution.
+The **frontend-backend** communication also presented challenges, particularly with environment variable management and service discovery. We solved this by implementing robust error handling and creating fallback mechanisms for backend URL resolution.
 
 To overcome these challenges, we adopted a systematic debugging approach using comprehensive logging, extensive unit and integration testing, and incremental deployment strategies. The implementation of dev containers significantly improved development environment consistency and reduced setup friction for team members.
 
@@ -770,8 +769,12 @@ To overcome these challenges, we adopted a systematic debugging approach using c
 > Answer:
 
 All four team members, s242973 (Dionysios Sellinas), s253542 (Christos Psallidas), s253560 (Dimitrios Dimitriou), and s242831 (Georgios Fragkiadoulakis), contributed equally to the development of the project.
-Student s242973 was responsible for frontend development, logging and monitoring, and integration of the application in different OS.
-Student s242973 was responsible for the core development and integration of the project. More specifically that includes the training of the model using PyTorch Lightning, training configuration and checkpointing, GCP Cloud, Github actions, DVC, W&B, Ruff and profiling.
-Student s253560 was responsible for Docker containerization for training/API/frontend services, Hydra configuration,  Typer for command line interface, Github actions, FastAPI backend development with Prometheus monitoring, extensive testing strategies (unit, integration, and performance), GCP Cloud Run of api dockerfile,  Locust for load testing, ONNX for creating and sharing machine learning models, Evidently AI for data drifting, ptflops and quantization and distributed data loading.
-Student s253542 was responsible for the whole setup of Google cloud and VMs, pre-commits, PEP8/Ruff, dockerization. 
+
+Student **s242831** was responsible for frontend development, logging and monitoring, and integration of the application in different OS.
+
+Student **s242973** was responsible for the core development and integration of the project. More specifically that includes the training of the model using PyTorch Lightning, training configuration and checkpointing, GCP Cloud, Github actions, DVC, W&B, Ruff and profiling.
+
+Student s253560 was responsible for Docker containerization of the training and API services, configuring Hydra, developing a command-line interface with Typer, implementing GitHub Actions, developing the FastAPI backend with Prometheus monitoring, and designing extensive testing strategies (unit, integration, and performance tests). He also deployed the API Dockerfile on GCP Cloud Run, performed load testing using Locust, created and shared machine learning models with ONNX, monitored data drift with Evidently AI, and handled ptflops, quantization, and distributed data loading.
+
+Student **s253542** was responsible for the whole setup of Google cloud and VMs, pre-commits, PEP8/Ruff, dockerization. 
 
