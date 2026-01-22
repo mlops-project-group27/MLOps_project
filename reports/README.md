@@ -112,7 +112,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Write some documentation for your application (M32)
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
+* [X] Create an architectural diagram over your MLOps pipeline
 * [X] Make sure all group members have an understanding about all parts of the project
 * [X] Uploaded all your code to GitHub
 
@@ -150,12 +150,12 @@ s242973, s242831, s253542, s253560
 
 We used **EvidentlyAI** to perform data drift detection by comparing reference data collected during training with data observed at inference time.
 
-For configuration management, we used **Hydra**, which simplified experiment configuration and enabled clean seperation between code and hyperparametrs.
+For configuration management, we used **Hydra**, which simplified experiment configuration and enabled clean separation between code and hyperparameters.
 
-We also used **Typer** to implement command-line interfaces for training and evaluation scripts, providing a consistent and user-freindly way to run
+We also used **Typer** to implement command-line interfaces for training and evaluation scripts, providing a consistent and user-friendly way to run
 project components.
 
-Finnaly, we used **Weights & Bias** for experiment tracking, enabling logging of training metrics, configuration parameters, and model artifacts, which
+Finally, we used **Weights & Bias** for experiment tracking, enabling logging of training metrics, configuration parameters, and model artifacts, which
 supported systematic experimentation and comparison across runs.
 
 ![Weights & Biases experiment tracking](figures/wandb_run.jpg)
@@ -178,15 +178,15 @@ supported systematic experimentation and comparison across runs.
 >
 > Answer:
 
-We managed project dependencies using a combination of `pyproject.toml` and the `uv` package manager, which allowed us to maintain a reproducible
-and well-defined Python environment. All direct dependencies are declared in `pyproject.toml`, while exact, resolved versions are pinned in the
+We managed project dependencies using a combination of `pyproject.toml`, `requirements.txt` and the `uv` package manager, which allowed us to maintain a reproducible
+and well-defined Python environment. All direct dependencies are declared in `requirements.txt`, while exact, resolved versions are pinned in the
 automatically generated `uv.lock` file.
 
-For local development, a new team memmber ca recreate the environment by first installing `uv` and then running `uv sync`, which installs all
-dependencies exaclty as specified in the lock file. Development-specific dependecies, such as testing and linitng tools, are included in a seperate
-dependency group to keep the runtime environment minimal.
+For local development, a new team member recreate the environment by first installing `uv` and then running `uv pip install -r requirements.txt`, which installs all
+dependencies exactly as specified in the lock file. Development-specific dependencies, such as testing and linting tools, are included in a separate
+dependency file `requirements_dev.txt` to keep the runtime environment minimal.
 
-Dependencies are als reprorudef in containerized environments. The Dockerfiles used for training and inference install dependencies directly from the
+Dependencies are all preprocedure in containerized environments. The **Dockerfiles** used for training and inference install dependencies directly from the
 same dependency specifications, ensuring consistency between local development, continuous integration, and deployment.
 
 ### Question 5
@@ -207,16 +207,16 @@ The project was initialized using the official cookiecutter template provided in
 We retained the core layout, including the `src/` directory for source code, `tests/` for automated testing, `configs/` for configuration files, and
 `data/` for raw and processed datasets.
 
-The main project logic was implemented inside the `src/credit)card_fraud_analysis` package, including data handlign, model definition, training,
+The main project logic was implemented inside the `src/credit_card_fraud_analysis` package, including data handling, model definition, training,
 evaluation, and an API for inference. The `tests/` directory was extended with unit, integration, and performance tests to validate components
 of the pipeline.
 
-We also added a `dockerfiles/` directory containing seperate Dockerfiles for training, inference, and the API, as well as a Cloud Build configuration
-for automated training. A `reports/` directory was included for the exam report, and `docs/` was exneted with project documentation and profilling
+We also added a `dockerfiles/` directory containing separate **Dockerfiles** for training, inference, and the API, as well as a **Cloud Build** configuration
+for automated training. A `reports/` directory was included for the exam report, and `docs/` was extended with project documentation and profiling
 notes.
 
-Overall, the cookiecuter structure was preservec, while additional fodlers and files were introduced to support deployment, monitoring, and
-reproducability requirements.
+Overall, the cookiecuter structure was preserve, while additional folders and files were introduced to support deployment, monitoring, and
+reproducibility requirements.
 
 ### Question 6
 
@@ -231,18 +231,13 @@ reproducability requirements.
 >
 > Answer:
 
-We implemented explixit rules for code quality and formatting to ensure consistency and maintainability throught the project. Code style and linting were
-enforced using **Ruff**, which was configured in `pyproject.toml` and integrated both as a **pre-commit hook** and as part of our **CI workfllows**. This
+We implemented explicit rules for code quality and formatting to ensure consistency and maintainability through the project. Code style and linting were
+enforced using **Ruff**, which was configured in `pyproject.toml` and integrated both as a **pre-commit hook** and as part of our **CI workflows**. This
 ensured that common issued such as unused imports, inconsistent formatting, and style violations were automatically detected both locally before commits
 and remotely during CI.
 
-Formatting was handled usign `ruff format`, guaranteeing a uniform code style across all contributors without relying on manual enforcements. In addition,
-core modules include **docstrings** that describe the purpose of the tests, functions, and training components, improving readability and easing onboarding
-for new contributors.
-
-We did not enforce strict static type checking, we focused on practical documentation and automated wuality checks that scale well with project size. These
-pracitces are especially important in larger projects, where multiples contributions workd in parallel, as they reduce technical debt, improve code readabilit
-, and prevent subtle errors from propagating unnoticed through the codebase.
+Formatting was handled using `ruff format`, keeping a uniform code style across all contributors without relying on manual enforcements.  We did not enforce strict static type checking, we focused on practical documentation and automated quality checks that scale well with project size. These
+practices are especially important in larger projects, where multiples contributions worked in parallel, as they reduce technical debt, improve code readability, and prevent errors from propagating unnoticed through the codebase.
 
 ## Version control
 
@@ -263,9 +258,9 @@ pracitces are especially important in larger projects, where multiples contribut
 
 In total, we implemented **11 test files in total**, covering unit, integration, and performance testing. Unit tests validate critical components such as
 data loading, model construction, forward passes, training, evaluation, and configuration handling. We also implemented both API unit tests and API
-integrations tests, the latter explixitly testing FastAPIA lifespan events, model loading, and error handling for invalid inputs.
+integrations tests, where the latter explicitly defines testing FastAPI lifespan events, model loading, and error handling for invalid inputs.
 
-Additionally, we included a **performance test suite using Locust** to evaluate request latency and system behaviour under load.
+Finally, we included a **performance test suite using Locust** to mimic request latency and system behaviour under load.
 
 ### Question 8
 
@@ -281,9 +276,9 @@ Additionally, we included a **performance test suite using Locust** to evaluate 
 > Answer:
 
 The total code coverage of our project is approximately **45%**. This coverage mainly reflects the parts of the system that are most critical for
-correctness and stability, including data preprocessing, model inference, API endpoints, configuration loading, and core utility functions.
-Several modules with low or zero coverage correspond to training scripts, Lightning training pipelines, dataset creation utilities,
-and scalability experiments, which are not executed during normal inference or deployment and are therefore less critical for runtime reliability.
+the stability of our application, including data preprocessing, model inference, API endpoints, configuration loading, and core utility functions.
+Several modules with low or zero coverage correspond to **training scripts, Lightning training pipelines, dataset creation utilities,
+and scalability experiments**, which are not executed during normal inference or deployment and are therefore less critical for runtime reliability.
 
 Even if our code had close to 100% coverage, we would not consider it fully error-free. High coverage only indicates that lines of code were executed,
 not that all edge cases, failure modes, or logical errors were correctly handled. In particular, integration issues, performance bottlenecks,
@@ -303,9 +298,10 @@ and validation on real or adversarial data.
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
-Yes, our workflow included the use of branches and pull requests. During the project, new features and fixes were developed on separate branches instead
+
+Our workflow included the use of **branches and pull requests**. During the project, new features and fixes were developed on separate branches instead
 of directly on the main branch. Each branch focused on a specific task, such as adding tests, improving the CI pipeline, profiling performance, adding
-Docker support, or updating dependencies.
+**Docker** support, or updating dependencies.
 When a task was completed, the changes were merged into the main branch using pull requests. This allowed us to review the changes run automated tests,
 nd make sure the code worked correctly before merging. The Git history shows several merged pull requests from feature branches, which confirms that
 this workflow was actively used.
@@ -324,13 +320,9 @@ After the pull requests were merged, the feature branches were removed. This hel
 >
 > Answer:
 
-Yes, we used DVC for managing data in our project. The raw and processed datasets are tracked using DVC instead of Git, while Git only stores small
-metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
-We configured a remote DVC storage using Google Cloud Storage (GCS). This allows all team members a remote DVC storage using Google Cloud Storage (GCS).
-This allows all team members and CI pipelines to pull pipelines to pull the exact same version of the data when checking out a specific Git commit.
-As a result, experiments can be reproduced reliably, since the code version and the corresponding data version are always aligned.
-Using DVC also made it easy to detect whether data had changed and whether retraining or re-running experiments was required. This was especially
-useful when datasets evolved during development.
+**DVC** was utilized for managing data in our project. TInstead of storing large datasets directly in Git, raw and processed data are tracked with DVC, while Git only keeps small metadata files such as `data.dvc`. This prevents large data files from bloating the Git repository and keeps version control fast and clean.
+We configured a remote DVC storage using **Google Cloud Storage (GCS)**. This ensures that when a specific Git commit is checked out, the corresponding data can be retrieved, allowing experiments to be reliably reproduced since code and data versions are always synchronized.
+Additionally, DVC made it easy to track changes in the data, helping determine when retraining or rerunning experiments was necessary. This proved especially valuable as datasets evolved during development.
 
 ### Question 11
 
@@ -348,18 +340,20 @@ useful when datasets evolved during development.
 > Answer:
 
 We use GitHub Actions to implement continuous integration (CI) for our project. The CI pipeline is automatically triggered on every `push` and `pull_request` to the
-`main` branch, ensuring that new changes are continuously vaildated before being merged.
+`main` branch, ensuring that all new code is validated against our quality standards before being merged.
 
-Our CI setup covers code quality checks, formatting, and automated testing. In particular, we run static code analysis and import/format consistency checks using Ruff,
-followed  by unit and integration tests using Pytest. This ensures that code adheres to a consistent style and that functional beahvior is verified automatically.
+Our CI setup is divided into several logical stages to ensure code health. First, we perform linting and formatting checks using
+`Ruff`. This allows us to catch syntax errors, unused imports, and style inconsistencies instantly. Following the linting stage, 
+we execute our comprehensive test suite using `Pytest`. This includes both unit tests for individual functions and 
+integration tests to verify that our machine learning components work together seamlessly.
 
-To ensure robustness and portability, our CI workflow runs across mutliple operating systems (`ubuntu-latest`, `windows-latest`, and `macos-latest`) and multiple
-Python versions (Python 3.11 and 3.12) using a matrix strategy. This helps detect OS- or versio-specific issues early and improves reproducability across environments.
+To ensure robustness and portability, our CI workflow runs across multiple operating systems (`ubuntu-latest`, `windows-latest`, and `macos-latest`) and multiple
+Python versions `(Python 3.11 and 3.12)`. This is critical for our team, as it guarantees that the project remains functional for contributors regardless of their local environment.
 
-We also make use of dependency caching by `actions/setup-python`, caching pip dependencies based on `requirements.txt` and `requirements_dev.txt`. This significantly
-reduces CI excecution time by avoiding dependency installations across runs.
+To optimize performance, we utilize GitHub’s caching mechanisms. Specifically, we make use of dependency caching by `actions/setup-python`, caching pip dependencies based on `requirements.txt` and `requirements_dev.txt`. This significantly
+reduces CI execution time by avoiding dependency installations across runs.
 
-An exampl of a triggered workflow can be found here
+An example of a triggered workflow can be found here
 <https://github.com/mlops-project-group27/MLOps_project/actions/runs/21176597297>
 
 ## Running code and tracking experiments
